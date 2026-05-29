@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    /* Language & Environment */
+    "target": "ES2022",
+    "module": "commonjs",
+    "lib": ["ES2022"],
+
+    /* Output */
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "sourceMap": true,
+    "declaration": true,
+
+    /* Module Resolution */
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+
+    /* Type Checking */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+
+    /* Paths */
+    "baseUrl": "./src",
+    "paths": {
+      "@config/*":      ["config/*"],
+      "@controllers/*": ["controllers/*"],
+      "@services/*":    ["services/*"],
+      "@repositories/*":["repositories/*"],
+      "@middleware/*":  ["middleware/*"],
+      "@routes/*":      ["routes/*"],
+      "@utils/*":       ["utils/*"],
+      "@types/*":       ["types/*"],
+      "@validations/*": ["validations/*"],
+      "@database/*":    ["database/*"]
+    },
+
+    /* Interop */
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "tests"]
+}

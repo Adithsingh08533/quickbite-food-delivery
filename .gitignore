@@ -1,0 +1,46 @@
+# ─── Dependencies ───────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.js
+
+# ─── Build Output ───────────────────────────────────────────────
+dist/
+build/
+*.js.map
+
+# ─── Environment Files ──────────────────────────────────────────
+# NEVER commit real env files — only .env.example is safe to commit
+.env
+.env.development
+.env.production
+.env.local
+.env.test
+
+# ─── Logs ───────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Test Coverage ──────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ─── OS & Editor ────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# ─── TypeScript ─────────────────────────────────────────────────
+*.tsbuildinfo
+
+# ─── Docker ─────────────────────────────────────────────────────
+docker-compose.override.yml
+
+# ─── Uploads ────────────────────────────────────────────────────
+uploads/
+temp/
