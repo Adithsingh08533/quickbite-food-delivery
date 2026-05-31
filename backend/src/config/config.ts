@@ -16,6 +16,8 @@ import path from 'path';
 // Load the correct .env file based on NODE_ENV
 const envFile = process.env.NODE_ENV === 'production'
   ? '.env.production'
+  : process.env.NODE_ENV === 'test'
+  ? '.env.test'
   : '.env.development';
 
 dotenv.config({ path: path.resolve(process.cwd(), envFile) });

@@ -23,6 +23,6 @@ module.exports = {
     '!src/database/seeds/**',
     '!src/database/migrations/**',
   ],
-  setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+  setupFiles: ['<rootDir>/tests/setup.ts'],
   testTimeout: 30000,
 };
