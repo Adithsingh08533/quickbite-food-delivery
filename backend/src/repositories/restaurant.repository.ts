@@ -29,6 +29,9 @@ const mapRestaurant = (row: Record<string, any>): Restaurant => ({
   latitude:         row.latitude ? parseFloat(row.latitude) : null,
   longitude:        row.longitude ? parseFloat(row.longitude) : null,
   distance:         row.distance ? parseFloat(row.distance) : undefined,
+  ownerName:        row.owner_name,
+  ownerEmail:       row.owner_email,
+  ownerPhone:       row.owner_phone,
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -218,7 +221,7 @@ export const restaurantRepository = {
 
     const [dataRes, countRes] = await Promise.all([
       pool.query(
-        `SELECT r.*, u.name AS owner_name, u.email AS owner_email
+        `SELECT r.*, u.name AS owner_name, u.email AS owner_email, u.phone AS owner_phone
          FROM restaurants r
          JOIN users u ON u.id = r.owner_id
          ${where} ORDER BY r.created_at DESC LIMIT $${li} OFFSET $${li + 1}`,

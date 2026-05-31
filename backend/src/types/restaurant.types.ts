@@ -27,6 +27,9 @@ export interface Restaurant {
   latitude: number | null;
   longitude: number | null;
   distance?: number; // Calculated distance when querying nearby
+  ownerName?: string;
+  ownerEmail?: string;
+  ownerPhone?: string;
 }
 
 export interface FoodCategory {

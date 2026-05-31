@@ -9,14 +9,14 @@ interface Restaurant {
   name: string;
   address: string;
   isOpen: boolean;
-  status: string;
+  approvalStatus: string;
 }
 
 interface Order {
   id: string;
   status: string;
-  createdAt: string;
-  totalPrice: number | string;
+  placedAt: string;
+  totalAmount: number | string;
 }
 
 export const OwnerDashboard = () => {
@@ -39,6 +39,7 @@ export const OwnerDashboard = () => {
       
       if (rest) {
         const orderData = await api.get(`/orders/restaurant/${rest.id}`);
+        console.log("Dashboard API:", orderData.data);
         setOrders(orderData.data.data || []);
       }
     } catch (err) {
@@ -141,7 +142,7 @@ export const OwnerDashboard = () => {
     );
   }
 
-  if (restaurant.status === 'pending') {
+  if (restaurant.approvalStatus === 'pending') {
     return (
       <div className="dashboard-card animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '4rem 2rem', textAlign: 'center' }}>
         <Clock size={48} color="var(--warning)" />
@@ -151,7 +152,7 @@ export const OwnerDashboard = () => {
     );
   }
   
-  if (restaurant.status === 'rejected') {
+  if (restaurant.approvalStatus === 'rejected') {
     return (
       <div className="dashboard-card animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '4rem 2rem', textAlign: 'center' }}>
         <AlertCircle size={48} color="var(--error)" />
@@ -163,8 +164,10 @@ export const OwnerDashboard = () => {
 
   // Calculate Stats
   const today = new Date().toDateString();
-  const todaysOrders = orders.filter(o => new Date(o.createdAt).toDateString() === today);
-  const revenue = todaysOrders.reduce((sum, o) => sum + Number(o.totalPrice), 0);
+  const todaysOrders = orders.filter(o => o.placedAt && new Date(o.placedAt).toDateString() === today);
+  const revenue = todaysOrders
+    .filter(o => o.status === 'delivered')
+    .reduce((sum, o) => sum + Number(o.totalAmount || 0), 0);
 
   return (
     <div className="animate-fade-in">
@@ -237,9 +240,9 @@ export const OwnerDashboard = () => {
                 <tr key={order.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
                   <td style={{ padding: '1rem', fontWeight: 500 }}>#{order.id.slice(0, 8).toUpperCase()}</td>
                   <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>
-                    {new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    {order.placedAt ? new Date(order.placedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'N/A'}
                   </td>
-                  <td style={{ padding: '1rem' }}>₹{order.totalPrice}</td>
+                  <td style={{ padding: '1rem' }}>₹{Number(order.totalAmount || 0).toFixed(2)}</td>
                   <td style={{ padding: '1rem' }}>
                     <span style={{ 
                       padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600,
