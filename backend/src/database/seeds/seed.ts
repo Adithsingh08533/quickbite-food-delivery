@@ -114,95 +114,42 @@ async function seed(): Promise<void> {
         (id, owner_id, name, description, cuisine_type, phone,
          address, city, state, pin_code,
          avg_rating, review_count, delivery_fee, min_order_amount,
-         delivery_time_min, is_open, approval_status,
-         image_url)
-       VALUES
-        ($1, $11, 'Spice Garden',
-         'Authentic North Indian cuisine with rich gravies, tandoor delights, and aromatic biryanis.',
-         'North Indian', '+918023456789',
-         '12, Commercial Street, Shivajinagar', 'Bengaluru', 'Karnataka', '560001',
-         4.5, 128, 30.00, 150.00, 35, true, 'approved',
-         'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800'),
-
-        ($2, $11, 'Dosa Palace',
-         'Crispy dosas, fluffy idlis, and piping hot sambar — South Indian comfort food at its finest.',
-         'South Indian', '+918023456790',
-         '45, Gandhi Bazaar, Basavanagudi', 'Bengaluru', 'Karnataka', '560004',
-         4.3, 95, 20.00, 100.00, 25, true, 'approved',
-         'https://images.unsplash.com/photo-1630383249896-424e482df921?w=800'),
-
-        ($3, $12, 'Dragon Wok',
-         'Indo-Chinese fusion — Hakka noodles, Manchurian, and sizzlers packed with bold flavours.',
-         'Chinese', '+918023456791',
-         '78, Church Street, MG Road', 'Bengaluru', 'Karnataka', '560001',
-         4.1, 76, 40.00, 200.00, 40, true, 'approved',
-         'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800'),
-
-        ($4, $12, 'The Burger Hub',
-         'Gourmet burgers, loaded fries, and thick shakes — fast food done the right way.',
-         'Fast Food', '+918023456792',
-         '23, Koramangala 5th Block', 'Bengaluru', 'Karnataka', '560095',
-         4.4, 210, 25.00, 150.00, 20, true, 'approved',
-         'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800'),
-
-        ($5, $11, 'Biryani House',
-         'Dum cooked Hyderabadi biryani with saffron, whole spices, and tender meat or fresh veggies.',
-         'Biryani', '+918023456793',
-         '56, Residency Road, Richmond Town', 'Bengaluru', 'Karnataka', '560025',
-         4.7, 342, 35.00, 200.00, 45, true, 'approved',
-         'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800')`,
-      [
-        restId.spiceGarden, restId.dosaPalace, restId.dragonWok,
-        restId.burgerHub, restId.biryaniHouse,
-        userId.owner1, userId.owner2,
-        // $11 = owner1, $12 = owner2
-        userId.owner1, userId.owner1, userId.owner2, userId.owner2, userId.owner1,
-      ]
-    );
-
-    // Re-insert with corrected binding (simpler approach)
-    await client.query('DELETE FROM restaurants');
-    await client.query(
-      `INSERT INTO restaurants
-        (id, owner_id, name, description, cuisine_type, phone,
-         address, city, state, pin_code,
-         avg_rating, review_count, delivery_fee, min_order_amount,
-         delivery_time_min, is_open, approval_status, image_url)
+         delivery_time_min, is_open, approval_status, image_url, latitude, longitude)
        VALUES
         ($1,  $6,  'Spice Garden',
          'Authentic North Indian cuisine with rich gravies, tandoor delights, and aromatic biryanis.',
          'North Indian', '+918023456789',
          '12, Commercial Street, Shivajinagar', 'Bengaluru', 'Karnataka', '560001',
          4.5, 128, 30.00, 150.00, 35, true, 'approved',
-         'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800'),
+         'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=800', 12.9830, 77.6046),
 
         ($2,  $6,  'Dosa Palace',
          'Crispy dosas, fluffy idlis, and piping hot sambar — South Indian comfort food at its finest.',
          'South Indian', '+918023456790',
          '45, Gandhi Bazaar, Basavanagudi', 'Bengaluru', 'Karnataka', '560004',
          4.3, 95, 20.00, 100.00, 25, true, 'approved',
-         'https://images.unsplash.com/photo-1630383249896-424e482df921?w=800'),
+         'https://images.unsplash.com/photo-1630383249896-424e482df921?w=800', 12.9406, 77.5738),
 
         ($3,  $7,  'Dragon Wok',
          'Indo-Chinese fusion — Hakka noodles, Manchurian, and sizzlers packed with bold flavours.',
          'Chinese', '+918023456791',
          '78, Church Street, MG Road', 'Bengaluru', 'Karnataka', '560001',
          4.1, 76, 40.00, 200.00, 40, true, 'approved',
-         'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800'),
+         'https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800', 12.9750, 77.6046),
 
         ($4,  $7,  'The Burger Hub',
          'Gourmet burgers, loaded fries, and thick shakes — fast food done the right way.',
          'Fast Food', '+918023456792',
          '23, Koramangala 5th Block', 'Bengaluru', 'Karnataka', '560095',
          4.4, 210, 25.00, 150.00, 20, true, 'approved',
-         'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800'),
+         'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800', 12.9352, 77.6245),
 
         ($5,  $6,  'Biryani House',
          'Dum cooked Hyderabadi biryani with saffron, whole spices, and tender meat or fresh veggies.',
          'Biryani', '+918023456793',
          '56, Residency Road, Richmond Town', 'Bengaluru', 'Karnataka', '560025',
          4.7, 342, 35.00, 200.00, 45, true, 'approved',
-         'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800')`,
+         'https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?w=800', 12.9647, 77.6009)`,
       [
         restId.spiceGarden, restId.dosaPalace, restId.dragonWok,
         restId.burgerHub, restId.biryaniHouse,
@@ -281,67 +228,6 @@ async function seed(): Promise<void> {
     console.log('🍕 Seeding food items...');
 
     const fi = (): string => uuidv4();
-
-    // ── Spice Garden ──────────────────────────────────────────────
-    await client.query(
-      `INSERT INTO food_items (id, restaurant_id, category_id, name, description, price, is_veg, is_featured, prep_time_min) VALUES
-        -- Starters
-        ($1, $41, $37, 'Paneer Tikka',
-         'Marinated cottage cheese cubes grilled in tandoor with mint chutney.',
-         280.00, true, true, 15),
-        ($2, $41, $37, 'Chicken Seekh Kebab',
-         'Minced chicken with aromatic spices, grilled on skewers.',
-         320.00, false, true, 18),
-        ($3, $41, $37, 'Veg Spring Roll',
-         'Crispy rolls stuffed with cabbage, carrots and glass noodles.',
-         180.00, true, false, 12),
-
-        -- Main Course
-        ($4, $41, $38, 'Butter Chicken',
-         'Tender chicken in a rich, creamy tomato-based sauce. A true classic.',
-         380.00, false, true, 25),
-        ($5, $41, $38, 'Dal Makhani',
-         'Slow-cooked black lentils with butter and cream. Punjabi soul food.',
-         260.00, true, true, 30),
-        ($6, $41, $38, 'Palak Paneer',
-         'Fresh spinach gravy with golden paneer cubes and mild spices.',
-         290.00, true, false, 20),
-        ($7, $41, $38, 'Mutton Rogan Josh',
-         'Kashmiri-style mutton in a red gravy of whole spices and yogurt.',
-         450.00, false, false, 35),
-
-        -- Breads
-        ($8, $41, $39, 'Butter Naan',
-         'Soft leavened flatbread baked in tandoor, brushed with butter.',
-         60.00, true, false, 8),
-        ($9, $41, $39, 'Laccha Paratha',
-         'Flaky, multi-layered whole wheat bread, pan-roasted with ghee.',
-         70.00, true, false, 10),
-        ($10, $41, $39, 'Garlic Naan',
-         'Naan topped with garlic and cilantro, straight from the tandoor.',
-         80.00, true, false, 8),
-
-        -- Desserts
-        ($11, $41, $40, 'Gulab Jamun',
-         'Soft milk dumplings soaked in rose-flavoured sugar syrup.',
-         120.00, true, false, 5),
-        ($12, $41, $40, 'Rasmalai',
-         'Soft chenna patties in chilled saffron milk with pistachios.',
-         150.00, true, true, 5)`,
-      [
-        fi(), fi(), fi(),  // starters
-        fi(), fi(), fi(), fi(), // mains
-        fi(), fi(), fi(),  // breads
-        fi(), fi(),        // desserts
-        // These will be replaced below with proper UUIDs
-        catId.sgStarters, catId.sgMains, catId.sgBreads, catId.sgDesserts,
-        restId.spiceGarden,
-      ]
-    );
-
-    // Due to complex parameterization, use individual inserts per restaurant
-    // Clearing and re-doing with named const IDs for clarity:
-    await client.query('DELETE FROM food_items');
 
     const foodItems: Array<{
       id: string; restaurantId: string; categoryId: string;

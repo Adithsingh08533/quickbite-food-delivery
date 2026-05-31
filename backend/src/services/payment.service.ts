@@ -3,6 +3,7 @@ import Razorpay from 'razorpay';
 import config from '../config/config';
 import { orderRepository } from '../repositories/order.repository';
 import { paymentRepository } from '../repositories/payment.repository';
+import { foodRepository } from '../repositories/food.repository';
 import { AppError } from '../utils/AppError';
 import { Payment } from '../types';
 
@@ -104,6 +105,9 @@ export const paymentService = {
 
     // Mark the order payment status as paid
     await orderRepository.updatePaymentStatus(payment.orderId, 'paid');
+
+    // Clear the cart
+    await foodRepository.clearCart(data.userId);
 
     return updatedPayment!;
   },

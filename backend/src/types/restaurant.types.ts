@@ -24,6 +24,9 @@ export interface Restaurant {
   fssaiNumber: string | null;
   createdAt: Date;
   updatedAt: Date;
+  latitude: number | null;
+  longitude: number | null;
+  distance?: number; // Calculated distance when querying nearby
 }
 
 export interface FoodCategory {
@@ -52,6 +55,8 @@ export interface CreateRestaurantDto {
   deliveryTimeMin?: number;
   gstin?: string;
   fssaiNumber?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface UpdateRestaurantDto {
@@ -69,6 +74,8 @@ export interface UpdateRestaurantDto {
   deliveryTimeMin?: number;
   gstin?: string;
   fssaiNumber?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface RestaurantFilterDto {
@@ -80,6 +87,9 @@ export interface RestaurantFilterDto {
   sortBy?: 'rating' | 'deliveryTime' | 'deliveryFee';
   page?: number;
   limit?: number;
+  lat?: number;
+  lng?: number;
+  radius?: number; // In kilometers
 }
 
 export interface CreateCategoryDto {

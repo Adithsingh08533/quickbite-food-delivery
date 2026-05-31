@@ -11,11 +11,20 @@ export const restaurantController = {
     const { restaurants, total, page, limit } = await restaurantService.getApprovedRestaurants(
       req.query as never
     );
+    // Cache public restaurant list for 60s — balanced freshness vs. CDN efficiency
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=30');
     sendPaginated(res, restaurants, total, page, limit, 'Restaurants retrieved');
+  }),
+
+  getNearbyRestaurants: asyncHandler(async (req: Request, res: Response) => {
+    const { restaurants, total, page, limit } = await restaurantService.getNearbyRestaurants(req.query);
+    res.setHeader('Cache-Control', 'public, max-age=30, stale-while-revalidate=15');
+    sendPaginated(res, restaurants, total, page, limit, 'Nearby restaurants retrieved');
   }),
 
   getRestaurantById: asyncHandler(async (req: Request, res: Response) => {
     const restaurant = await restaurantService.getRestaurantById(req.params.id!);
+    res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=30');
     sendSuccess(res, restaurant, 'Restaurant retrieved');
   }),
 

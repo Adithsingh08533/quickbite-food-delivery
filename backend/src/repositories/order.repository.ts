@@ -166,17 +166,27 @@ export const orderRepository = {
       pool.query(`SELECT COUNT(*) FROM orders o ${where}`, params.slice(0, idx - 1)),
     ]);
 
-    const orders = await Promise.all(
-      dataRes.rows.map(async row => {
-        const itemsRes = await pool.query('SELECT * FROM order_items WHERE order_id = $1', [row.id]);
-        return {
-          ...mapOrder(row),
-          items: itemsRes.rows.map(mapOrderItem),
-          restaurantName: row.restaurant_name,
-          restaurantImageUrl: row.restaurant_image_url,
-        };
-      })
-    );
+    const orderIds = dataRes.rows.map(r => r.id);
+    let orders: OrderWithItems[];
+    
+    if (orderIds.length === 0) {
+      orders = [];
+    } else {
+      const itemsRes = await pool.query(
+        'SELECT * FROM order_items WHERE order_id = ANY($1::uuid[])', [orderIds]
+      );
+      const itemsByOrderId = itemsRes.rows.reduce<Record<string, OrderItem[]>>((acc, row) => {
+        if (!acc[row.order_id]) acc[row.order_id] = [];
+        acc[row.order_id]!.push(mapOrderItem(row));
+        return acc;
+      }, {});
+      orders = dataRes.rows.map(row => ({
+        ...mapOrder(row),
+        items: itemsByOrderId[row.id] || [],
+        restaurantName: row.restaurant_name,
+        restaurantImageUrl: row.restaurant_image_url,
+      }));
+    }
 
     return { orders, total: parseInt(countRes.rows[0].count, 10) };
   },
@@ -209,19 +219,29 @@ export const orderRepository = {
       pool.query(`SELECT COUNT(*) FROM orders o ${where}`, params.slice(0, idx - 1)),
     ]);
 
-    const orders = await Promise.all(
-      dataRes.rows.map(async row => {
-        const itemsRes = await pool.query('SELECT * FROM order_items WHERE order_id = $1', [row.id]);
-        return {
-          ...mapOrder(row),
-          items: itemsRes.rows.map(mapOrderItem),
-          restaurantName: row.restaurant_name,
-          restaurantImageUrl: row.restaurant_image_url,
-        };
-      })
-    );
+    const restaurantOrderIds = dataRes.rows.map(r => r.id);
+    let restaurantOrders: OrderWithItems[];
 
-    return { orders, total: parseInt(countRes.rows[0].count, 10) };
+    if (restaurantOrderIds.length === 0) {
+      restaurantOrders = [];
+    } else {
+      const itemsRes = await pool.query(
+        'SELECT * FROM order_items WHERE order_id = ANY($1::uuid[])', [restaurantOrderIds]
+      );
+      const itemsByOrderId = itemsRes.rows.reduce<Record<string, OrderItem[]>>((acc, row) => {
+        if (!acc[row.order_id]) acc[row.order_id] = [];
+        acc[row.order_id]!.push(mapOrderItem(row));
+        return acc;
+      }, {});
+      restaurantOrders = dataRes.rows.map(row => ({
+        ...mapOrder(row),
+        items: itemsByOrderId[row.id] || [],
+        restaurantName: row.restaurant_name,
+        restaurantImageUrl: row.restaurant_image_url,
+      }));
+    }
+
+    return { orders: restaurantOrders, total: parseInt(countRes.rows[0].count, 10) };
   },
 
   async updateStatus(

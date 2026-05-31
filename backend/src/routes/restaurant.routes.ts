@@ -34,6 +34,48 @@ router.get('/', validate('query', restaurantQuerySchema), restaurantController.g
 
 /**
  * @swagger
+ * /restaurants:
+ *   post:
+ *     tags: [Restaurants]
+ *     summary: Create a restaurant (owner only)
+ *     responses:
+ *       201: { description: Restaurant created }
+ */
+router.post(
+  '/',
+  authenticateJWT, authorizeRole('owner'),
+  validate('body', createRestaurantSchema),
+  restaurantController.createRestaurant
+);
+/**
+ * @swagger
+ * /restaurants/nearby:
+ *   get:
+ *     tags: [Restaurants]
+ *     summary: Browse nearby restaurants (public, paginated)
+ *     security: []
+ *     parameters:
+ *       - { in: query, name: lat, schema: { type: number }, required: true }
+ *       - { in: query, name: lng, schema: { type: number }, required: true }
+ *       - { in: query, name: radius, schema: { type: number }, required: true }
+ *     responses:
+ *       200: { description: Paginated restaurant list sorted by distance }
+ */
+router.get('/nearby', restaurantController.getNearbyRestaurants);
+
+/**
+ * @swagger
+ * /restaurants/my:
+ *   get:
+ *     tags: [Restaurants]
+ *     summary: Get the logged-in owner's restaurants
+ *     responses:
+ *       200: { description: Owner's restaurant list }
+ */
+router.get('/my', authenticateJWT, authorizeRole('owner'), restaurantController.getMyRestaurants);
+
+/**
+ * @swagger
  * /restaurants/{id}:
  *   get:
  *     tags: [Restaurants]
@@ -46,50 +88,6 @@ router.get('/', validate('query', restaurantQuerySchema), restaurantController.g
  *       404: { description: Restaurant not found }
  */
 router.get('/:id', restaurantController.getRestaurantById);
-
-/**
- * @swagger
- * /restaurants:
- *   post:
- *     tags: [Restaurants]
- *     summary: Create a new restaurant (owner only)
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [name, cuisineType, phone, address, city, pinCode]
- *             properties:
- *               name:            { type: string, example: "Spice Garden" }
- *               cuisineType:     { type: string, example: "North Indian" }
- *               phone:           { type: string, example: "+918023456789" }
- *               address:         { type: string, example: "12, MG Road" }
- *               city:            { type: string, example: "Bengaluru" }
- *               pinCode:         { type: string, example: "560001" }
- *               deliveryFee:     { type: number, example: 30 }
- *               minOrderAmount:  { type: number, example: 150 }
- *               deliveryTimeMin: { type: integer, example: 35 }
- *     responses:
- *       201: { description: Restaurant created, pending admin approval }
- */
-router.post(
-  '/',
-  authenticateJWT, authorizeRole('owner'),
-  validate('body', createRestaurantSchema),
-  restaurantController.createRestaurant
-);
-
-/**
- * @swagger
- * /restaurants/my:
- *   get:
- *     tags: [Restaurants]
- *     summary: Get the logged-in owner's restaurants
- *     responses:
- *       200: { description: Owner's restaurant list }
- */
-router.get('/my', authenticateJWT, authorizeRole('owner'), restaurantController.getMyRestaurants);
 
 /**
  * @swagger

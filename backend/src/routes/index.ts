@@ -7,6 +7,9 @@ import orderRoutes       from './order.routes';
 import paymentRoutes     from './payment.routes';
 import adminRoutes       from './admin.routes';
 import notificationRoutes from './notification.routes';
+import reviewRoutes from './review.routes';
+import wishlistRoutes from './wishlist.routes';
+import couponRoutes from './coupon.routes';
 
 const router = Router();
 
@@ -22,5 +25,8 @@ router.use('/orders',        orderRoutes);
 router.use('/payments',      paymentRoutes);
 router.use('/admin',         adminRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/reviews',       reviewRoutes);
+router.use('/wishlist',      wishlistRoutes);
+router.use('/coupons',       couponRoutes);
 
 export default router;

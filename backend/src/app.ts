@@ -27,8 +27,25 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }, // Allow Cloudinary images
 }));
 
+// ─── CORS Configuration ───────────────────────────────────────────────────────
+// CORS_ORIGIN can be a comma-separated list: "http://localhost:5173,https://quickbite.vercel.app"
+const rawCorsOrigins = config.server.corsOrigin
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin:      config.server.corsOrigin,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
+    if (!origin) return callback(null, true);
+    if (rawCorsOrigins.includes(origin)) return callback(null, true);
+    // In development, allow any localhost port for convenience
+    if (config.isDev && /^https?:\/\/localhost(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+    logger.warn(`CORS blocked origin: ${origin}`);
+    callback(new Error(`CORS: origin ${origin} is not allowed`));
+  },
   credentials: true,         // Allow cookies (refresh token)
   methods:     ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],

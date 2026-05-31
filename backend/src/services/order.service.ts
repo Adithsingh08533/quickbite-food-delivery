@@ -7,6 +7,7 @@ import { AppError } from '../utils/AppError';
 import { generateOrderNumberFallback } from '../utils/generateOrderNumber';
 import { OrderWithItems, OrderStatus } from '../types';
 import { PlaceOrderDto, UpdateOrderStatusDto, OrderQueryDto } from '../validations';
+import { getIO } from '../socket';
 
 // Valid status transitions — enforces the state machine
 const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
@@ -111,8 +112,7 @@ export const orderService = {
     });
 
     // ── Post-order actions ────────────────────────────────────────
-    await Promise.all([
-      foodRepository.clearCart(userId),
+    const postActions: Promise<any>[] = [
       couponId ? orderRepository.incrementCouponUsage(couponId) : Promise.resolve(),
       notificationRepository.create({
         userId,
@@ -121,7 +121,19 @@ export const orderService = {
         body:  `Your order #${orderNumber} from ${restaurant.name} has been placed.`,
         data:  { orderId: order.id, orderNumber },
       }),
-    ]);
+    ];
+
+    if (data.paymentMethod === 'cod') {
+      postActions.push(foodRepository.clearCart(userId));
+    }
+
+    await Promise.all(postActions);
+
+    try {
+      getIO().to(`restaurant_${restaurantId}`).emit('new_order', order);
+    } catch (err) {
+      console.error('Socket emission failed:', err);
+    }
 
     return order;
   },
@@ -215,9 +227,15 @@ export const orderService = {
 
     const notif = notifMap[data.status as OrderStatus];
     if (notif) {
+      // Map code status to existing postgres enum notification_type
+      let notifType = `order_${data.status}`;
+      if (data.status === 'ready_for_pickup') {
+        notifType = 'order_ready';
+      }
+      
       await notificationRepository.create({
         userId: order.userId,
-        type:   `order_${data.status}`,
+        type:   notifType,
         title:  notif.title,
         body:   notif.body,
         data:   { orderId: id, orderNumber: order.orderNumber },
@@ -226,6 +244,13 @@ export const orderService = {
 
     const updated = await orderRepository.findById(id);
     if (!updated) throw new AppError('Order not found after update', 500);
+
+    try {
+      getIO().to(`user_${updated.userId}`).emit('order_status_updated', updated);
+    } catch (err) {
+      console.error('Socket emission failed:', err);
+    }
+
     return updated;
   },
 
@@ -245,6 +270,13 @@ export const orderService = {
 
     const updated = await orderRepository.findById(id);
     if (!updated) throw new AppError('Order not found', 500);
+
+    try {
+      getIO().to(`restaurant_${updated.restaurantId}`).emit('order_cancelled', updated);
+    } catch (err) {
+      console.error('Socket emission failed:', err);
+    }
+
     return updated;
   },
 };

@@ -23,7 +23,7 @@ export const validate =
 
       res.status(422).json({
         success: false,
-        error: 'Validation failed',
+        error: `Validation failed: ${errors.map(e => `${e.field} (${e.message})`).join(', ')}`,
         statusCode: 422,
         details: errors,
       });

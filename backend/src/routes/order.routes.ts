@@ -55,6 +55,20 @@ router.get(
 
 /**
  * @swagger
+ * /orders/restaurant/{restaurantId}:
+ *   get:
+ *     tags: [Orders]
+ *     summary: Get all orders for a restaurant (owner only)
+ */
+router.get(
+  '/restaurant/:restaurantId',
+  authorizeRole('owner'),
+  validate('query', orderQuerySchema),
+  orderController.getRestaurantOrders
+);
+
+/**
+ * @swagger
  * /orders/{id}:
  *   get:
  *     tags: [Orders]
@@ -69,19 +83,9 @@ router.get('/:id', orderController.getOrderById);
  * /orders/{id}/status:
  *   patch:
  *     tags: [Orders]
- *     summary: Update order status (owner or admin only)
+ *     summary: Update order status (owner/admin)
  *     parameters:
  *       - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required: [status]
- *             properties:
- *               status: { type: string, enum: [accepted, preparing, ready_for_pickup, out_for_delivery, delivered, cancelled] }
- *               cancellationReason: { type: string }
  */
 router.patch(
   '/:id/status',
@@ -95,22 +99,13 @@ router.patch(
  * /orders/{id}/cancel:
  *   post:
  *     tags: [Orders]
- *     summary: Cancel an order (customer only, only in pending/accepted status)
+ *     summary: Cancel an order (customer)
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
  */
-router.post('/:id/cancel', authorizeRole('customer'), orderController.cancelOrder);
-
-/**
- * @swagger
- * /orders/restaurant/{restaurantId}:
- *   get:
- *     tags: [Orders]
- *     summary: Get all orders for a restaurant (owner only)
- */
-router.get(
-  '/restaurant/:restaurantId',
-  authorizeRole('owner'),
-  validate('query', orderQuerySchema),
-  orderController.getRestaurantOrders
+router.post(
+  '/:id/cancel',
+  orderController.cancelOrder
 );
 
 export default router;

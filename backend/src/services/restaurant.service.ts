@@ -39,6 +39,29 @@ export const restaurantService = {
     return { restaurants, total, page: query.page, limit: query.limit };
   },
 
+  async getNearbyRestaurants(query: any): Promise<{
+    restaurants: Restaurant[]; total: number; page: number; limit: number;
+  }> {
+    if (!query.lat || !query.lng || !query.radius) {
+      throw new AppError('lat, lng, and radius are required', 400);
+    }
+    const page = parseInt(query.page) || 1;
+    const limit = parseInt(query.limit) || 12;
+    const { restaurants, total } = await restaurantRepository.findNearby({
+      lat: parseFloat(query.lat),
+      lng: parseFloat(query.lng),
+      radius: parseFloat(query.radius),
+      city:         query.city,
+      cuisineType:  query.cuisineType,
+      search:       query.search,
+      isOpen:       query.isOpen === 'true' ? true : query.isOpen === 'false' ? false : undefined,
+      sortBy:       query.sortBy,
+      page,
+      limit,
+    });
+    return { restaurants, total, page, limit };
+  },
+
   async getRestaurantById(id: string): Promise<Restaurant> {
     const restaurant = await restaurantRepository.findById(id);
     if (!restaurant) throw new AppError('Restaurant not found', 404);

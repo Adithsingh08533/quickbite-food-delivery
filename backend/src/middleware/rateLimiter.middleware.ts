@@ -18,10 +18,11 @@ const baseOpts = (max: number, windowMs: number): Partial<Options> => ({
 });
 
 /**
- * Strict limiter for auth endpoints — prevents brute-force attacks.
- * 5 requests per 15 minutes per IP.
+ * Strict limiter for authentication routes (login, register, reset password).
+ * Allows 10 requests per 15 minutes per IP — blocks credential stuffing while
+ * allowing legitimate retries after a typo.
  */
-export const authRateLimiter = rateLimit(baseOpts(5, 15 * 60 * 1000));
+export const authRateLimiter = rateLimit(baseOpts(10, 15 * 60 * 1000));
 
 /**
  * General API rate limiter — prevents abuse on regular endpoints.

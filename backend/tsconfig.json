@@ -43,8 +43,12 @@
 
     /* Interop */
     "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    /* Type Roots – ensures express.d.ts global augmentation is loaded by ts-node */
+    "typeRoots": ["./src/types", "./node_modules/@types"]
   },
   "include": ["src/**/*"],
+  "files": ["src/types/express.d.ts"],
   "exclude": ["node_modules", "dist", "tests"]
 }

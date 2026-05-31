@@ -9,6 +9,7 @@ import app from './app';
 import config from './config/config';
 import { connectDB } from './database';
 import logger from './utils/logger';
+import { initializeSocket } from './socket';
 
 const startServer = async (): Promise<void> => {
   try {
@@ -28,6 +29,10 @@ const startServer = async (): Promise<void> => {
         logger.info(`   Swagger: http://localhost:${config.server.port}/api/docs`);
       }
     });
+
+    // ── 3.5 Initialize Socket.io ─────────────────────────────────────
+    initializeSocket(server);
+    logger.info(`🔌 Socket.io attached to server`);
 
     // ── 4. Graceful Shutdown ──────────────────────────────────────────
     const shutdown = (signal: string) => {
