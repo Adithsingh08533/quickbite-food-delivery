@@ -9,7 +9,7 @@ import config from '../config/config';
 const REFRESH_COOKIE_OPTIONS = {
   httpOnly:  true,
   secure:    config.isProd,
-  sameSite:  'strict' as const,
+  sameSite:  config.isProd ? ('none' as const) : ('lax' as const),
   maxAge:    7 * 24 * 60 * 60 * 1000, // 7 days in ms
   path:      '/api/v1/auth',
 };

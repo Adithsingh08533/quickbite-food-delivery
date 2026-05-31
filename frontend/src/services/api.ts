@@ -79,6 +79,20 @@ api.interceptors.response.use(
         api.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
         
+        // Persist the new token to localStorage so it survives page reloads
+        try {
+          const authStorage = localStorage.getItem('auth-storage');
+          if (authStorage) {
+            const parsed = JSON.parse(authStorage);
+            if (parsed.state) {
+              parsed.state.accessToken = newAccessToken;
+              localStorage.setItem('auth-storage', JSON.stringify(parsed));
+            }
+          }
+        } catch (e) {
+          console.error('Failed to update auth storage', e);
+        }
+
         processQueue(null, newAccessToken);
         
         // Retry the original request

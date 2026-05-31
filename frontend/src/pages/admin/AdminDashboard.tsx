@@ -15,7 +15,7 @@ export const AdminDashboard = () => {
       setError(null);
       const [userRes, restRes] = await Promise.all([
         api.get('/admin/users'),
-        api.get('/admin/restaurants')
+        api.get('/admin/restaurants?limit=1000')
       ]);
       setUsers(userRes.data?.data?.users || userRes.data?.data || []);
       setRestaurants(restRes.data?.data || []);
