@@ -112,9 +112,9 @@ export const OrderManager = () => {
     switch (currentStatus) {
       case 'pending':
         return (
-          <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button size="sm" onClick={() => updateStatus(id, 'accepted')} style={{ flex: 1 }} disabled={isUpdating} isLoading={isUpdating}>Accept</Button>
-            <Button size="sm" variant="danger" onClick={() => updateStatus(id, 'cancelled')} style={{ flex: 1 }} disabled={isUpdating}>Reject</Button>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={() => updateStatus(id, 'accepted')} className="flex-1" disabled={isUpdating} isLoading={isUpdating}>Accept</Button>
+            <Button size="sm" variant="danger" onClick={() => updateStatus(id, 'cancelled')} className="flex-1" disabled={isUpdating}>Reject</Button>
           </div>
         );
       case 'accepted':
@@ -133,63 +133,69 @@ export const OrderManager = () => {
   const activeOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.status));
   const pastOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.status));
 
-  if (loading && orders.length === 0) return <div>Loading orders...</div>;
+  if (loading && orders.length === 0) return <div className="p-8 text-center text-text-secondary">Loading orders...</div>;
 
   return (
     <div className="animate-fade-in">
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '2rem' }}>Order Management</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-8">Order Management</h1>
 
-      <h2 style={{ fontSize: '1.125rem', marginBottom: '1rem', color: 'var(--text-secondary)' }}>Active Orders ({activeOrders.length})</h2>
+      <h2 className="text-lg font-semibold text-text-secondary mb-4 border-b border-border pb-2">Active Orders ({activeOrders.length})</h2>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {activeOrders.length === 0 ? (
-          <div className="dashboard-card" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>
-            No active orders at the moment.
+          <div className="col-span-full bg-white rounded-xl border border-border p-12 text-center text-text-secondary shadow-sm">
+            <div className="mx-auto w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
+              <Clock size={28} className="text-gray-400" />
+            </div>
+            <p className="text-lg font-medium">No active orders at the moment.</p>
+            <p className="text-sm mt-1">New orders will appear here automatically.</p>
           </div>
         ) : (
           activeOrders.map(order => (
-            <div key={order.id} className="dashboard-card" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+            <div key={order.id} className="bg-white rounded-xl border border-border shadow-sm flex flex-col hover:shadow-md transition-shadow">
+              <div className="p-5 border-b border-border bg-gray-50/50 rounded-t-xl flex justify-between items-start">
                 <div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 700 }}>#{order.id.slice(-6).toUpperCase()}</h3>
-                  <div style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}>
-                    <Clock size={14} /> {new Date(order.placedAt).toLocaleTimeString()}
+                  <h3 className="text-lg font-bold text-text-primary">#{order.id.slice(-6).toUpperCase()}</h3>
+                  <div className="text-text-secondary text-sm flex items-center gap-1.5 mt-1 font-medium">
+                    <Clock size={14} /> {new Date(order.placedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                   </div>
                 </div>
-                <div style={{ 
-                  padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase',
-                  background: order.status === 'pending' ? '#fef3c7' : '#e0e7ff',
-                  color: order.status === 'pending' ? '#b45309' : '#4338ca'
-                }}>
+                <div className={`px-2.5 py-1 rounded-md text-xs font-bold tracking-wide uppercase ${
+                  order.status === 'pending' ? 'bg-warning/20 text-warning' : 'bg-indigo-100 text-indigo-700'
+                }`}>
                   {order.status.replace('_', ' ')}
                 </div>
               </div>
               
-              <div style={{ flex: 1, marginBottom: '1rem' }}>
-                <div style={{ fontWeight: 600, marginBottom: '0.5rem' }}>Items:</div>
-                {order.items.map((item: OrderItem) => (
-                  <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
-                    <span>{item.quantity} x {item.foodName}</span>
-                    <span style={{ color: 'var(--text-secondary)' }}>₹{item.totalPrice || (item.unitPrice * item.quantity)}</span>
-                  </div>
-                ))}
-              </div>
-              
-              <div style={{ borderTop: '1px dashed var(--border-color)', paddingTop: '1rem', marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, marginBottom: '0.5rem' }}>
-                  <span>Total</span>
-                  <span>₹{order.totalAmount}</span>
+              <div className="p-5 flex-1 flex flex-col">
+                <div className="font-bold text-text-primary mb-3 text-sm uppercase tracking-wider">Items</div>
+                <div className="space-y-3 mb-6 flex-1">
+                  {order.items.map((item: OrderItem) => (
+                    <div key={item.id} className="flex justify-between text-sm items-start gap-4">
+                      <span className="font-medium text-text-primary">
+                        <span className="text-text-secondary font-bold mr-1.5">{item.quantity}×</span> 
+                        {item.foodName}
+                      </span>
+                      <span className="text-text-secondary shrink-0 font-medium">₹{item.totalPrice || (item.unitPrice * item.quantity)}</span>
+                    </div>
+                  ))}
                 </div>
                 
-                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                    <MapPin size={14} /> Delivery Address Provided
+                <div className="pt-4 border-t border-dashed border-border mt-auto">
+                  <div className="flex justify-between font-bold text-text-primary mb-3 items-center">
+                    <span>Total Amount</span>
+                    <span className="text-lg">₹{order.totalAmount}</span>
                   </div>
-                  {/* Real app would show customer details here if included in backend payload */}
+                  
+                  <div className="text-xs text-text-secondary font-medium bg-gray-50 p-2.5 rounded border border-gray-100">
+                    <div className="flex items-center gap-1.5 text-text-primary">
+                      <MapPin size={14} className="text-primary" /> Delivery Address Provided
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              <div style={{ marginTop: 'auto' }}>
+              <div className="p-5 pt-0 mt-auto">
                 {getNextStatusAction(order.status, order.id)}
               </div>
             </div>
@@ -197,42 +203,46 @@ export const OrderManager = () => {
         )}
       </div>
 
-      <h2 style={{ fontSize: '1.125rem', marginBottom: '1rem', color: 'var(--text-secondary)' }}>Past Orders</h2>
-      <div className="dashboard-card" style={{ padding: 0, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
-              <th style={{ padding: '1rem 1.5rem' }}>Order ID</th>
-              <th style={{ padding: '1rem 1.5rem' }}>Time</th>
-              <th style={{ padding: '1rem 1.5rem' }}>Amount</th>
-              <th style={{ padding: '1rem 1.5rem' }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pastOrders.length === 0 ? (
-              <tr><td colSpan={4} style={{ padding: '2rem', textAlign: 'center' }}>No past orders.</td></tr>
-            ) : (
-              pastOrders.map(order => (
-                <tr key={order.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <td style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>#{order.id.slice(0, 8).toUpperCase()}</td>
-                  <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>
-                    {new Date(order.placedAt).toLocaleString()}
-                  </td>
-                  <td style={{ padding: '1rem 1.5rem' }}>₹{order.totalAmount}</td>
-                  <td style={{ padding: '1rem 1.5rem' }}>
-                    <span style={{ 
-                      padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600,
-                      background: order.status === 'delivered' ? '#dcfce7' : '#fee2e2',
-                      color: order.status === 'delivered' ? '#16a34a' : '#ef4444'
-                    }}>
-                      {order.status.toUpperCase()}
-                    </span>
-                  </td>
+      <h2 className="text-lg font-semibold text-text-secondary mb-4 border-b border-border pb-2">Past Orders</h2>
+      <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden mb-12">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse min-w-[500px]">
+            <thead>
+              <tr className="bg-gray-50 border-b border-border text-left text-text-secondary text-sm">
+                <th className="p-4 font-semibold whitespace-nowrap">Order ID</th>
+                <th className="p-4 font-semibold whitespace-nowrap">Time</th>
+                <th className="p-4 font-semibold whitespace-nowrap">Amount</th>
+                <th className="p-4 font-semibold whitespace-nowrap">Status</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {pastOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="p-8 text-center text-text-secondary">No past orders.</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                pastOrders.map(order => (
+                  <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="p-4 font-medium text-text-primary whitespace-nowrap">#{order.id.slice(0, 8).toUpperCase()}</td>
+                    <td className="p-4 text-text-secondary whitespace-nowrap">
+                      {new Date(order.placedAt).toLocaleString(undefined, {
+                        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                      })}
+                    </td>
+                    <td className="p-4 font-medium text-text-primary whitespace-nowrap">₹{order.totalAmount}</td>
+                    <td className="p-4 whitespace-nowrap">
+                      <span className={`px-2.5 py-1 rounded-md text-xs font-bold tracking-wide uppercase ${
+                        order.status === 'delivered' ? 'bg-success-bg text-success' : 'bg-error-bg text-error'
+                      }`}>
+                        {order.status.replace('_', ' ')}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

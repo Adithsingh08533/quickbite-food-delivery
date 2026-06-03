@@ -40,14 +40,14 @@ export const AdminDashboard = () => {
     }
   };
 
-  if (loading) return <div className="container" style={{ padding: '4rem 0', textAlign: 'center' }}>Loading admin dashboard...</div>;
+  if (loading) return <div className="p-16 text-center text-text-secondary">Loading admin dashboard...</div>;
 
   if (error) {
     return (
-      <div className="container" style={{ padding: '4rem 0', textAlign: 'center' }}>
-        <h2 style={{ color: 'var(--error)' }}>Error</h2>
-        <p>{error}</p>
-        <Button onClick={fetchData} style={{ marginTop: '1rem' }}>Retry</Button>
+      <div className="p-16 text-center">
+        <h2 className="text-error text-2xl font-bold mb-4">Error</h2>
+        <p className="text-text-primary mb-6">{error}</p>
+        <Button onClick={fetchData}>Retry</Button>
       </div>
     );
   }
@@ -60,72 +60,78 @@ export const AdminDashboard = () => {
 
   return (
     <div className="animate-fade-in">
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '2rem' }}>Overview</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-8">Overview</h1>
       
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div className="dashboard-card stat-card">
-          <div className="stat-icon" style={{ background: '#dbeafe', color: '#3b82f6' }}><Users /></div>
-          <div className="stat-info">
-            <h4>Total Users</h4>
-            <p>{safeUsers?.length || 0}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-xl p-6 border border-border shadow-sm flex items-center gap-4 transition-shadow hover:shadow-md">
+          <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+            <Users size={24} />
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-text-secondary mb-1">Total Users</h4>
+            <p className="text-2xl font-bold text-text-primary">{safeUsers?.length || 0}</p>
           </div>
         </div>
         
-        <div className="dashboard-card stat-card">
-          <div className="stat-icon" style={{ background: '#dcfce7', color: '#16a34a' }}><Store /></div>
-          <div className="stat-info">
-            <h4>Active Restaurants</h4>
-            <p>{activeRestaurantsCount}</p>
+        <div className="bg-white rounded-xl p-6 border border-border shadow-sm flex items-center gap-4 transition-shadow hover:shadow-md">
+          <div className="w-12 h-12 rounded-lg bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+            <Store size={24} />
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-text-secondary mb-1">Active Restaurants</h4>
+            <p className="text-2xl font-bold text-text-primary">{activeRestaurantsCount}</p>
           </div>
         </div>
         
-        <div className="dashboard-card stat-card">
-          <div className="stat-icon" style={{ background: '#fef3c7', color: '#d97706' }}><CheckSquare /></div>
-          <div className="stat-info">
-            <h4>Pending Approvals</h4>
-            <p>{pendingCount}</p>
+        <div className="bg-white rounded-xl p-6 border border-border shadow-sm flex items-center gap-4 transition-shadow hover:shadow-md">
+          <div className="w-12 h-12 rounded-lg bg-yellow-100 text-yellow-600 flex items-center justify-center shrink-0">
+            <CheckSquare size={24} />
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-text-secondary mb-1">Pending Approvals</h4>
+            <p className="text-2xl font-bold text-text-primary">{pendingCount}</p>
           </div>
         </div>
       </div>
 
-      <div className="dashboard-card">
-        <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem' }}>User Management</h2>
+      <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-border">
+          <h2 className="text-xl font-bold text-text-primary m-0">User Management</h2>
+        </div>
         {safeUsers.length === 0 ? (
-          <p style={{ color: 'var(--text-secondary)' }}>No users found.</p>
+          <p className="p-6 text-text-secondary">No users found.</p>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
               <thead>
-                <tr style={{ background: '#f9fafb', borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
-                  <th style={{ padding: '1rem 1.5rem' }}>Name</th>
-                  <th style={{ padding: '1rem 1.5rem' }}>Email</th>
-                  <th style={{ padding: '1rem 1.5rem' }}>Role</th>
-                  <th style={{ padding: '1rem 1.5rem' }}>Status</th>
-                  <th style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>Actions</th>
+                <tr className="bg-gray-50 border-b border-border text-left text-text-secondary text-sm">
+                  <th className="p-4 font-semibold whitespace-nowrap">Name</th>
+                  <th className="p-4 font-semibold whitespace-nowrap">Email</th>
+                  <th className="p-4 font-semibold whitespace-nowrap">Role</th>
+                  <th className="p-4 font-semibold whitespace-nowrap">Status</th>
+                  <th className="p-4 font-semibold text-right whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-border">
                 {safeUsers.map(u => (
-                  <tr key={u.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                    <td style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>{u.name}</td>
-                    <td style={{ padding: '1rem 1.5rem', color: 'var(--text-secondary)' }}>{u.email}</td>
-                    <td style={{ padding: '1rem 1.5rem' }}>
-                      <span style={{ 
-                        padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'capitalize',
-                        background: u.role === 'admin' ? '#f3e8ff' : u.role === 'owner' ? '#dbeafe' : '#f3f4f6',
-                        color: u.role === 'admin' ? '#7e22ce' : u.role === 'owner' ? '#1d4ed8' : '#4b5563'
-                      }}>
+                  <tr key={u.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="p-4 font-medium text-text-primary whitespace-nowrap">{u.name}</td>
+                    <td className="p-4 text-text-secondary whitespace-nowrap">{u.email}</td>
+                    <td className="p-4 whitespace-nowrap">
+                      <span className={`px-2.5 py-1 rounded-md text-xs font-bold tracking-wide capitalize ${
+                        u.role === 'admin' ? 'bg-purple-100 text-purple-700' : u.role === 'owner' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                      }`}>
                         {u.role}
                       </span>
                     </td>
-                    <td style={{ padding: '1rem 1.5rem' }}>
+                    <td className="p-4 whitespace-nowrap">
                       {u.isBanned ? (
-                        <span style={{ color: 'var(--error)', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.875rem' }}><Ban size={14} /> Banned</span>
+                        <span className="text-error flex items-center gap-1.5 text-sm font-medium"><Ban size={14} /> Banned</span>
                       ) : (
-                        <span style={{ color: 'var(--success)', fontSize: '0.875rem' }}>Active</span>
+                        <span className="text-success text-sm font-medium">Active</span>
                       )}
                     </td>
-                    <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
+                    <td className="p-4 text-right whitespace-nowrap">
                       {u.role !== 'admin' && (
                         <Button 
                           size="sm" 

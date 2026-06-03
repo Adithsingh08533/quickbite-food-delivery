@@ -85,15 +85,15 @@ export const OwnerDashboard = () => {
     }
   };
 
-  if (loading) return <div>Loading dashboard...</div>;
+  if (loading) return <div className="p-8 text-center text-text-secondary">Loading dashboard...</div>;
 
   if (!restaurant) {
     return (
-      <div className="dashboard-card animate-fade-in" style={{ maxWidth: 500, margin: '0 auto', textAlign: 'center', padding: '3rem' }}>
-        <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>Welcome to Partner Hub</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>You don't have a registered restaurant yet. Create one to start receiving orders!</p>
+      <div className="bg-white rounded-xl shadow-sm border border-border p-8 md:p-12 text-center max-w-lg mx-auto animate-fade-in mt-8">
+        <h2 className="text-2xl font-bold mb-4">Welcome to Partner Hub</h2>
+        <p className="text-text-secondary mb-8">You don't have a registered restaurant yet. Create one to start receiving orders!</p>
         
-        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'left' }}>
+        <form onSubmit={handleRegister} className="flex flex-col gap-4 text-left">
           <Input 
             label="Restaurant Name" 
             placeholder="e.g. Spice Garden" 
@@ -136,7 +136,7 @@ export const OwnerDashboard = () => {
             value={formData.phone}
             onChange={e => setFormData({ ...formData, phone: e.target.value })}
           />
-          <Button type="submit" isLoading={isRegistering} fullWidth>Apply for Registration</Button>
+          <Button type="submit" isLoading={isRegistering} fullWidth className="mt-4">Apply for Registration</Button>
         </form>
       </div>
     );
@@ -144,20 +144,20 @@ export const OwnerDashboard = () => {
 
   if (restaurant.approvalStatus === 'pending') {
     return (
-      <div className="dashboard-card animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '4rem 2rem', textAlign: 'center' }}>
-        <Clock size={48} color="var(--warning)" />
-        <h2>Application Under Review</h2>
-        <p style={{ color: 'var(--text-secondary)', maxWidth: 400 }}>Your restaurant <strong>{restaurant.name}</strong> is currently pending approval by our admin team. You will be notified once it is approved.</p>
+      <div className="bg-white rounded-xl shadow-sm border border-border p-8 md:p-16 flex flex-col items-center gap-4 text-center animate-fade-in mt-8">
+        <Clock size={48} className="text-warning" />
+        <h2 className="text-2xl font-bold text-text-primary">Application Under Review</h2>
+        <p className="text-text-secondary max-w-md">Your restaurant <strong className="text-text-primary">{restaurant.name}</strong> is currently pending approval by our admin team. You will be notified once it is approved.</p>
       </div>
     );
   }
   
   if (restaurant.approvalStatus === 'rejected') {
     return (
-      <div className="dashboard-card animate-fade-in" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '4rem 2rem', textAlign: 'center' }}>
-        <AlertCircle size={48} color="var(--error)" />
-        <h2>Application Rejected</h2>
-        <p style={{ color: 'var(--text-secondary)', maxWidth: 400 }}>Unfortunately, your restaurant application was rejected. Please contact support for more details.</p>
+      <div className="bg-white rounded-xl shadow-sm border border-border p-8 md:p-16 flex flex-col items-center gap-4 text-center animate-fade-in mt-8">
+        <AlertCircle size={48} className="text-error" />
+        <h2 className="text-2xl font-bold text-text-primary">Application Rejected</h2>
+        <p className="text-text-secondary max-w-md">Unfortunately, your restaurant application was rejected. Please contact support for more details.</p>
       </div>
     );
   }
@@ -171,91 +171,91 @@ export const OwnerDashboard = () => {
 
   return (
     <div className="animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 style={{ fontSize: '1.875rem', fontWeight: 800 }}>{restaurant.name}</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>{restaurant.address}</p>
+          <h1 className="text-3xl font-extrabold text-text-primary">{restaurant.name}</h1>
+          <p className="text-text-secondary">{restaurant.address}</p>
         </div>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'white', padding: '0.5rem 1rem', borderRadius: 'var(--radius-full)', border: '1px solid var(--border-color)', boxShadow: 'var(--shadow-sm)' }}>
-          <span style={{ fontWeight: 600 }}>Accepting Orders</span>
-          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
-            <div style={{
-              width: 48, height: 24, borderRadius: 12, 
-              background: restaurant.isOpen ? 'var(--success)' : '#e5e7eb',
-              position: 'relative', transition: 'all 0.3s'
-            }} onClick={toggleStatus}>
-              <div style={{
-                width: 20, height: 20, borderRadius: 10, background: 'white',
-                position: 'absolute', top: 2, left: restaurant.isOpen ? 26 : 2,
-                transition: 'all 0.3s', boxShadow: '0 1px 3px rgba(0,0,0,0.3)'
-              }} />
+        <div className="flex items-center gap-4 bg-white px-4 py-2 rounded-full border border-border shadow-sm">
+          <span className="font-semibold text-text-primary text-sm md:text-base">Accepting Orders</span>
+          <label className="flex items-center cursor-pointer">
+            <div className={`w-12 h-6 rounded-full relative transition-colors duration-300 ${restaurant.isOpen ? 'bg-success' : 'bg-gray-200'}`} onClick={toggleStatus}>
+              <div className={`w-5 h-5 rounded-full bg-white absolute top-0.5 transition-all duration-300 shadow-md ${restaurant.isOpen ? 'left-[26px]' : 'left-0.5'}`} />
             </div>
           </label>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-        <div className="dashboard-card stat-card">
-          <div className="stat-icon" style={{ background: '#dcfce7', color: '#16a34a' }}><IndianRupee /></div>
-          <div className="stat-info">
-            <h4>Today's Revenue</h4>
-            <p>₹{revenue.toFixed(2)}</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-xl p-6 border border-border shadow-sm flex items-center gap-4 transition-shadow hover:shadow-md">
+          <div className="w-12 h-12 rounded-lg bg-green-100 text-green-600 flex items-center justify-center shrink-0">
+            <IndianRupee size={24} />
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-text-secondary mb-1">Today's Revenue</h4>
+            <p className="text-2xl font-bold text-text-primary">₹{revenue.toFixed(2)}</p>
           </div>
         </div>
         
-        <div className="dashboard-card stat-card">
-          <div className="stat-icon" style={{ background: '#e0e7ff', color: '#4f46e5' }}><ShoppingBag /></div>
-          <div className="stat-info">
-            <h4>Today's Orders</h4>
-            <p>{todaysOrders.length}</p>
+        <div className="bg-white rounded-xl p-6 border border-border shadow-sm flex items-center gap-4 transition-shadow hover:shadow-md">
+          <div className="w-12 h-12 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+            <ShoppingBag size={24} />
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-text-secondary mb-1">Today's Orders</h4>
+            <p className="text-2xl font-bold text-text-primary">{todaysOrders.length}</p>
           </div>
         </div>
         
-        <div className="dashboard-card stat-card">
-          <div className="stat-icon" style={{ background: '#fef9c3', color: '#ca8a04' }}><TrendingUp /></div>
-          <div className="stat-info">
-            <h4>Total Lifetime Orders</h4>
-            <p>{orders.length}</p>
+        <div className="bg-white rounded-xl p-6 border border-border shadow-sm flex items-center gap-4 transition-shadow hover:shadow-md">
+          <div className="w-12 h-12 rounded-lg bg-yellow-100 text-yellow-600 flex items-center justify-center shrink-0">
+            <TrendingUp size={24} />
+          </div>
+          <div>
+            <h4 className="text-sm font-medium text-text-secondary mb-1">Total Lifetime Orders</h4>
+            <p className="text-2xl font-bold text-text-primary">{orders.length}</p>
           </div>
         </div>
       </div>
       
-      <div className="dashboard-card">
-        <h3 style={{ marginBottom: '1.5rem', fontSize: '1.125rem' }}>Recent Activity</h3>
+      <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-border">
+          <h3 className="text-lg font-bold text-text-primary m-0">Recent Activity</h3>
+        </div>
         {orders.length === 0 ? (
-          <p style={{ color: 'var(--text-secondary)' }}>No orders yet.</p>
+          <div className="p-6 text-text-secondary">No orders yet.</div>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left', color: 'var(--text-secondary)' }}>
-                <th style={{ padding: '1rem' }}>Order ID</th>
-                <th style={{ padding: '1rem' }}>Time</th>
-                <th style={{ padding: '1rem' }}>Amount</th>
-                <th style={{ padding: '1rem' }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.slice(0, 5).map(order => (
-                <tr key={order.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <td style={{ padding: '1rem', fontWeight: 500 }}>#{order.id.slice(0, 8).toUpperCase()}</td>
-                  <td style={{ padding: '1rem', color: 'var(--text-secondary)' }}>
-                    {order.placedAt ? new Date(order.placedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'N/A'}
-                  </td>
-                  <td style={{ padding: '1rem' }}>₹{Number(order.totalAmount || 0).toFixed(2)}</td>
-                  <td style={{ padding: '1rem' }}>
-                    <span style={{ 
-                      padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600,
-                      background: order.status === 'delivered' ? '#dcfce7' : '#fef3c7',
-                      color: order.status === 'delivered' ? '#16a34a' : '#d97706'
-                    }}>
-                      {order.status.replace('_', ' ').toUpperCase()}
-                    </span>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-50 border-b border-border text-left text-text-secondary text-sm">
+                  <th className="p-4 font-semibold whitespace-nowrap">Order ID</th>
+                  <th className="p-4 font-semibold whitespace-nowrap">Time</th>
+                  <th className="p-4 font-semibold whitespace-nowrap">Amount</th>
+                  <th className="p-4 font-semibold whitespace-nowrap">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {orders.slice(0, 5).map(order => (
+                  <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="p-4 font-medium text-text-primary whitespace-nowrap">#{order.id.slice(0, 8).toUpperCase()}</td>
+                    <td className="p-4 text-text-secondary whitespace-nowrap">
+                      {order.placedAt ? new Date(order.placedAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'N/A'}
+                    </td>
+                    <td className="p-4 font-medium text-text-primary whitespace-nowrap">₹{Number(order.totalAmount || 0).toFixed(2)}</td>
+                    <td className="p-4 whitespace-nowrap">
+                      <span className={`px-2.5 py-1 rounded-md text-xs font-bold tracking-wide uppercase ${
+                        order.status === 'delivered' ? 'bg-success-bg text-success' : 'bg-warning/20 text-warning'
+                      }`}>
+                        {order.status.replace('_', ' ')}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

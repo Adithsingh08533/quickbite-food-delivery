@@ -4,7 +4,6 @@ import { CheckCircle, Clock, Utensils, Truck, CheckCircle2, Star } from 'lucide-
 import { api } from '../../services/api';
 import { useSocketStore } from '../../store/socketStore';
 import { Button } from '../../components/ui/Button';
-import './OrderHistory.css';
 
 interface OrderItem {
   id: string;
@@ -17,7 +16,7 @@ interface OrderItem {
 interface Order {
   id: string;
   restaurantId: string;
-  restaurantName: string; // Not returned directly by default, but assume it is or fetch it
+  restaurantName: string;
   status: string;
   totalAmount: number;
   placedAt: string;
@@ -77,6 +76,19 @@ export const OrderHistory = () => {
     });
   };
 
+  const getStatusColor = (status: string) => {
+    const statusMap: Record<string, string> = {
+      'pending': 'bg-amber-100 text-amber-700',
+      'accepted': 'bg-blue-100 text-blue-700',
+      'preparing': 'bg-purple-100 text-purple-700',
+      'ready_for_pickup': 'bg-indigo-100 text-indigo-700',
+      'out_for_delivery': 'bg-orange-100 text-orange-700',
+      'delivered': 'bg-emerald-100 text-emerald-700',
+      'cancelled': 'bg-red-100 text-red-700'
+    };
+    return statusMap[status] || 'bg-gray-100 text-gray-700';
+  };
+
   const getTimelineStatus = (status: string) => {
     const states = ['pending', 'accepted', 'preparing', 'ready_for_pickup', 'out_for_delivery', 'delivered'];
     const currentIndex = states.indexOf(status);
@@ -85,8 +97,11 @@ export const OrderHistory = () => {
     if (status === 'cancelled') return null;
 
     return (
-      <div className="timeline-container">
-        <div className="timeline">
+      <div className="p-6 border-t border-border bg-gray-50/50 hidden sm:block">
+        <div className="flex justify-between relative max-w-2xl mx-auto">
+          {/* Progress Line */}
+          <div className="absolute top-[14px] left-[30px] right-[30px] h-0.5 bg-border z-10"></div>
+          
           {[
             { id: 'pending', label: 'Placed', icon: <CheckCircle size={14} /> },
             { id: 'accepted', label: 'Accepted', icon: <CheckCircle size={14} /> },
@@ -94,10 +109,10 @@ export const OrderHistory = () => {
             { id: 'out_for_delivery', label: 'On the Way', icon: <Truck size={14} /> },
             { id: 'delivered', label: 'Delivered', icon: <CheckCircle2 size={14} /> },
           ].map((step) => {
-            // Map the detailed states to the 5 visual steps
             let stepIndex = states.indexOf(step.id);
-            // Handle 'ready_for_pickup' mapping to 'preparing' visually or between preparing/delivery
-            if (status === 'ready_for_pickup' && step.id === 'preparing') return <Step key={step.id} label={step.label} icon={step.icon} state="completed" />;
+            if (status === 'ready_for_pickup' && step.id === 'preparing') {
+              return <Step key={step.id} label={step.label} icon={step.icon} state="completed" />;
+            }
             
             let state = 'pending';
             if (currentIndex > stepIndex || (status === 'ready_for_pickup' && stepIndex <= 2)) state = 'completed';
@@ -110,12 +125,28 @@ export const OrderHistory = () => {
     );
   };
 
-  const Step = ({ label, icon, state }: { label: string, icon: React.ReactNode, state: string }) => (
-    <div className={`timeline-step ${state}`}>
-      <div className="timeline-icon">{icon}</div>
-      <div className="timeline-label">{label}</div>
-    </div>
-  );
+  const Step = ({ label, icon, state }: { label: string, icon: React.ReactNode, state: string }) => {
+    let iconClass = "w-[30px] h-[30px] rounded-full bg-white border-2 flex items-center justify-center transition-colors z-20 ";
+    let labelClass = "text-xs font-semibold uppercase mt-2 ";
+    
+    if (state === 'active') {
+      iconClass += "border-primary bg-primary text-white";
+      labelClass += "text-primary";
+    } else if (state === 'completed') {
+      iconClass += "border-success bg-success text-white";
+      labelClass += "text-text-secondary";
+    } else {
+      iconClass += "border-border text-text-muted";
+      labelClass += "text-text-muted";
+    }
+
+    return (
+      <div className="flex flex-col items-center relative z-20">
+        <div className={iconClass}>{icon}</div>
+        <div className={labelClass}>{label}</div>
+      </div>
+    );
+  };
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,61 +176,61 @@ export const OrderHistory = () => {
     }
   };
 
-  if (loading) return <div className="container" style={{ padding: '4rem 0' }}>Loading orders...</div>;
+  if (loading) return <div className="container mx-auto px-4 py-16">Loading orders...</div>;
 
   return (
-    <div className="container orders-container animate-fade-in">
+    <div className="container mx-auto px-4 py-8 lg:py-12 animate-fade-in">
       {showSuccess && (
-        <div style={{ backgroundColor: 'var(--success-bg)', color: 'var(--success)', padding: '1rem', borderRadius: 'var(--radius-md)', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}>
+        <div className="bg-success-bg text-success p-4 rounded-md mb-8 flex items-center gap-2 font-semibold">
           <CheckCircle size={20} />
           Payment successful! Your order has been placed.
         </div>
       )}
 
-      <h1 className="orders-title">Your Orders</h1>
+      <h1 className="text-3xl font-extrabold mb-8 text-text-primary">Your Orders</h1>
 
       {orders.length === 0 ? (
-        <div style={{ textAlign: 'center', color: 'var(--text-secondary)', padding: '4rem 0' }}>
-          <Utensils size={48} style={{ opacity: 0.5, margin: '0 auto 1rem' }} />
-          <h3>No orders yet</h3>
-          <p>Looks like you haven't made your menu yet.</p>
+        <div className="text-center text-text-secondary py-16">
+          <Utensils size={48} className="opacity-50 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold mb-2">No orders yet</h3>
+          <p>Looks like you haven't made any orders yet.</p>
         </div>
       ) : (
-        <div>
+        <div className="space-y-6">
           {orders.map(order => (
-            <div key={order.id} className="order-card animate-slide-up">
-              <div className="order-header">
-                <div className="order-info">
-                  <h3>Order #{order.id.slice(-8).toUpperCase()}</h3>
-                  <div className="order-meta">
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Clock size={14} /> {formatDate(order.placedAt)}
-                    </span>
+            <div key={order.id} className="bg-white rounded-xl shadow-sm border border-border overflow-hidden transition-shadow hover:shadow-md animate-slide-up">
+              <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 border-b border-border bg-gray-50/50">
+                <div>
+                  <h3 className="text-lg font-bold mb-1">Order #{order.id.slice(-8).toUpperCase()}</h3>
+                  <div className="text-text-secondary text-sm flex items-center gap-1">
+                    <Clock size={14} /> {formatDate(order.placedAt)}
                   </div>
                 </div>
-                <div className={`order-status status-${order.status}`}>
-                  {order.status.replace('_', ' ')}
+                <div className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider self-start ${getStatusColor(order.status)}`}>
+                  {order.status.replace(/_/g, ' ')}
                 </div>
               </div>
 
               {getTimelineStatus(order.status)}
 
-              <div className="order-items">
-                {order.items.map(item => (
-                  <div key={item.id} className="o-item">
-                    <div className="o-item-name">{item.quantity} x {item.foodName}</div>
-                    <div className="o-item-price">₹{item.unitPrice * item.quantity}</div>
-                  </div>
-                ))}
+              <div className="p-4 sm:p-6">
+                <div className="space-y-3">
+                  {order.items.map(item => (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <div className="font-medium text-text-primary">{item.quantity} x {item.foodName}</div>
+                      <div className="text-text-secondary">₹{item.unitPrice * item.quantity}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className="order-footer">
-                <span style={{ color: 'var(--text-secondary)' }}>Total Amount</span>
-                <span className="order-total">₹{order.totalAmount}</span>
+              <div className="p-4 sm:p-6 border-t border-dashed border-border flex justify-between items-center bg-gray-50/30">
+                <span className="text-text-secondary text-sm sm:text-base">Total Amount</span>
+                <span className="text-lg font-bold text-text-primary">₹{order.totalAmount}</span>
               </div>
               
               {order.status === 'delivered' && (
-                <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--gray-100)', display: 'flex', justifyContent: 'flex-end' }}>
+                <div className="p-4 sm:p-6 border-t border-gray-100 flex justify-end">
                   <Button variant="outline" size="sm" onClick={() => setReviewOrder(order)}>
                     Leave a Review
                   </Button>
@@ -212,38 +243,38 @@ export const OrderHistory = () => {
 
       {/* Review Modal */}
       {reviewOrder && (
-        <div className="modal-overlay" onClick={() => setReviewOrder(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ backgroundColor: 'white', padding: '2rem', borderRadius: 'var(--radius-lg)', width: '90%', maxWidth: '500px' }}>
-            <h2 style={{ marginBottom: '1.5rem', marginTop: 0 }}>Review Order</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4" onClick={() => setReviewOrder(null)}>
+          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-xl" onClick={e => e.stopPropagation()}>
+            <h2 className="text-xl font-bold mb-6">Review Order</h2>
             
             <form onSubmit={handleReviewSubmit}>
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Rating</label>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <div className="mb-6">
+                <label className="block mb-2 font-semibold text-text-primary">Rating</label>
+                <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map(star => (
                     <button
                       key={star}
                       type="button"
                       onClick={() => setRating(star)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      className="bg-transparent border-none cursor-pointer p-0 focus:outline-none transition-transform hover:scale-110"
                     >
-                      <Star size={32} color={star <= rating ? 'var(--warning)' : 'var(--gray-300)'} fill={star <= rating ? 'var(--warning)' : 'none'} />
+                      <Star size={36} className={`${star <= rating ? 'text-warning fill-warning' : 'text-gray-300'}`} />
                     </button>
                   ))}
                 </div>
               </div>
               
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>Comment (Optional)</label>
+              <div className="mb-6">
+                <label className="block mb-2 font-semibold text-text-primary">Comment (Optional)</label>
                 <textarea
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--gray-300)', minHeight: '100px', resize: 'vertical' }}
+                  className="w-full p-3 rounded-md border border-gray-300 min-h-[120px] resize-y outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
                   placeholder="Share details of your own experience at this place"
                 />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+              <div className="flex justify-end gap-4">
                 <Button type="button" variant="ghost" onClick={() => setReviewOrder(null)}>Cancel</Button>
                 <Button type="submit" isLoading={isSubmittingReview}>Submit Review</Button>
               </div>

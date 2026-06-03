@@ -4,7 +4,6 @@ import { api } from '../../services/api';
 import type { Restaurant } from '../../components/customer/RestaurantCard';
 import { RestaurantCard } from '../../components/customer/RestaurantCard';
 import { MapComponent } from '../../components/customer/MapComponent';
-import './Home.css';
 
 export const Home = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -78,45 +77,43 @@ export const Home = () => {
   }, [debouncedSearch, userLocation]);
 
   return (
-    <div className="home-container">
+    <div className="flex flex-col w-full">
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="container hero-content animate-fade-in">
-          <h1 className="hero-title">Hungry? We've got you covered.</h1>
-          <p className="hero-subtitle">Discover the best food & drinks in your city</p>
+      <section className="bg-gradient-to-br from-secondary to-[#111827] text-white py-12 md:py-20 mb-8 md:mb-12 relative overflow-hidden">
+        <div className="container mx-auto px-4 relative z-10 text-center max-w-2xl animate-fade-in">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4 leading-tight">Hungry? We've got you covered.</h1>
+          <p className="text-lg md:text-xl text-gray-300 mb-8">Discover the best food & drinks in your city</p>
           
-          <div className="search-bar">
-            <Search color="var(--text-muted)" style={{ margin: 'auto 0 auto 10px' }} />
+          <div className="flex bg-white rounded-full p-2 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.5)]">
+            <Search className="text-text-muted my-auto ml-3 shrink-0" />
             <input 
               type="text" 
-              className="search-input" 
+              className="flex-1 border-none bg-transparent px-4 text-base text-text-primary outline-none min-w-0" 
               placeholder="Search for restaurants, cuisines, or dishes..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <button className="btn btn-primary search-btn">Search</button>
+            <button className="btn btn-primary rounded-full px-6 whitespace-nowrap">Search</button>
           </div>
         </div>
       </section>
 
       {/* Main Content */}
-      <section className="container">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-          <h2 className="section-title" style={{ margin: 0 }}>
+      <section className="container mx-auto px-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <h2 className="text-2xl font-bold text-text-primary m-0">
             {debouncedSearch ? `Search results for "${debouncedSearch}"` : 'Top Restaurants Near You'}
           </h2>
-          <div className="view-toggle">
+          <div className="flex bg-gray-100 p-1 rounded-lg">
             <button 
-              className={`btn ${!isMapView ? 'btn-primary' : 'btn-outline'}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors text-sm font-medium ${!isMapView ? 'bg-white shadow-sm text-primary' : 'text-text-secondary hover:text-text-primary'}`}
               onClick={() => setIsMapView(false)}
-              style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
             >
               <List size={16} /> List
             </button>
             <button 
-              className={`btn ${isMapView ? 'btn-primary' : 'btn-outline'}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors text-sm font-medium ${isMapView ? 'bg-white shadow-sm text-primary' : 'text-text-secondary hover:text-text-primary'}`}
               onClick={() => setIsMapView(true)}
-              style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '0.5rem' }}
             >
               <MapIcon size={16} /> Map
             </button>
@@ -124,21 +121,22 @@ export const Home = () => {
         </div>
         
         {isMapView ? (
-          <MapComponent userLocation={userLocation} restaurants={restaurants} />
+          <div className="h-[600px] w-full rounded-xl overflow-hidden shadow-sm border border-border">
+            <MapComponent userLocation={userLocation} restaurants={restaurants} />
+          </div>
         ) : loading && restaurants.length === 0 ? (
-          <div className="restaurant-grid">
-            {[1, 2, 3, 4].map(n => (
-              <div key={n} style={{ height: '300px', backgroundColor: '#f3f4f6', borderRadius: 'var(--radius-lg)', animation: 'pulse 1.5s infinite' }} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mb-16">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
+              <div key={n} className="h-[300px] bg-gray-200 rounded-xl animate-pulse" />
             ))}
           </div>
         ) : error ? (
-          <div className="empty-state animate-fade-in" style={{ textAlign: 'center', padding: '3rem 0' }}>
-            <Utensils size={48} color="var(--error)" style={{ margin: '0 auto 1rem' }} />
-            <h3 style={{ color: 'var(--error)' }}>Something went wrong</h3>
-            <p>{error}</p>
+          <div className="text-center py-16 animate-fade-in">
+            <Utensils size={48} className="text-error mx-auto mb-4" />
+            <h3 className="text-error text-xl font-semibold mb-2">Something went wrong</h3>
+            <p className="text-text-secondary">{error}</p>
             <button 
-              className="btn btn-primary" 
-              style={{ marginTop: '1rem' }} 
+              className="btn btn-primary mt-4" 
               onClick={() => {
                 setLoading(true);
                 setSearch(s => s + ' '); 
@@ -149,16 +147,16 @@ export const Home = () => {
             </button>
           </div>
         ) : restaurants.length > 0 ? (
-          <div className="restaurant-grid" style={{ opacity: loading ? 0.6 : 1, transition: 'opacity 0.2s' }}>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mb-16 transition-opacity duration-200 ${loading ? 'opacity-60' : 'opacity-100'}`}>
             {restaurants.map(restaurant => (
               <RestaurantCard key={restaurant.id} restaurant={restaurant} />
             ))}
           </div>
         ) : (
-          <div className="empty-state animate-fade-in">
-            <Utensils size={48} color="var(--text-muted)" style={{ margin: '0 auto 1rem' }} />
-            <h3>No restaurants found</h3>
-            <p>Try adjusting your search criteria</p>
+          <div className="text-center py-16 animate-fade-in">
+            <Utensils size={48} className="text-text-muted mx-auto mb-4" />
+            <h3 className="text-xl font-semibold mb-2">No restaurants found</h3>
+            <p className="text-text-secondary">Try adjusting your search criteria</p>
           </div>
         )}
       </section>

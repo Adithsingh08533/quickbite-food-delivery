@@ -9,7 +9,6 @@ import { useCartStore } from '../../store/cartStore';
 import { useAuthStore } from '../../store/authStore';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import './Checkout.css';
 
 declare global {
   interface Window {
@@ -237,13 +236,13 @@ export const Checkout = () => {
     }
   };
 
-  if (loading) return <div className="container" style={{ padding: '4rem 0' }}>Loading checkout...</div>;
+  if (loading) return <div className="container mx-auto px-4 py-16">Loading checkout...</div>;
 
   if (items.length === 0 && !isProcessing) {
     return (
-      <div className="container" style={{ padding: '4rem 0', textAlign: 'center' }}>
-        <h2 style={{ marginBottom: '1rem' }}>Your Cart is Empty</h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>Looks like you haven't added anything to your cart yet.</p>
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h2 className="text-2xl font-bold mb-4">Your Cart is Empty</h2>
+        <p className="text-text-secondary mb-8">Looks like you haven't added anything to your cart yet.</p>
         <Button onClick={() => navigate('/')}>Explore Restaurants</Button>
       </div>
     );
@@ -254,28 +253,28 @@ export const Checkout = () => {
   const total = subtotal - discountAmount + tax + deliveryFee;
 
   return (
-    <div className="container checkout-container">
-      <div className="checkout-main animate-slide-up">
+    <div className="container mx-auto px-4 py-8 lg:py-12 flex flex-col lg:flex-row gap-8 items-start">
+      <div className="flex-1 w-full min-w-0 animate-slide-up">
         {/* Account Info */}
-        <div className="checkout-section">
-          <h2><CheckCircle color="var(--success)" size={24} /> Logged in as {user?.name}</h2>
-          <p style={{ color: 'var(--text-secondary)' }}>{user?.email}</p>
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-border">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><CheckCircle className="text-success" size={24} /> Logged in as {user?.name}</h2>
+          <p className="text-text-secondary">{user?.email}</p>
         </div>
 
         {/* Address Selection */}
-        <div className="checkout-section">
-          <h2><MapPin color="var(--primary)" size={24} /> Delivery Address</h2>
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-border">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><MapPin className="text-primary" size={24} /> Delivery Address</h2>
           
           {!isAddingAddress && addresses.length > 0 && (
-            <div className="address-grid">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               {addresses.map(addr => (
                 <div 
                   key={addr.id} 
-                  className={`address-card ${selectedAddressId === addr.id ? 'selected' : ''}`}
+                  className={`border-2 rounded-md p-4 cursor-pointer transition-colors ${selectedAddressId === addr.id ? 'border-primary bg-primary/10' : 'border-border bg-gray-50 hover:border-gray-300'}`}
                   onClick={() => setSelectedAddressId(addr.id)}
                 >
-                  <div className="address-type">{addr.label}</div>
-                  <div className="address-text">
+                  <div className={`text-xs font-bold uppercase mb-2 px-1.5 py-0.5 rounded inline-block ${selectedAddressId === addr.id ? 'bg-primary text-white' : 'bg-gray-200 text-text-secondary'}`}>{addr.label}</div>
+                  <div className="text-sm leading-relaxed text-text-primary">
                     {addr.flatHouse}, {addr.street}, {addr.area}<br />
                     {addr.city}, {addr.state} - {addr.pinCode}
                   </div>
@@ -291,29 +290,29 @@ export const Checkout = () => {
           )}
 
           {isAddingAddress && (
-            <form className="new-address-form animate-fade-in" onSubmit={handleSubmit(onAddAddress)}>
-              <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>Add a new delivery address</h3>
-              <div style={{ display: 'flex', gap: '1rem' }}>
+            <form className="bg-gray-50 p-6 rounded-md border border-border flex flex-col gap-4 animate-fade-in" onSubmit={handleSubmit(onAddAddress)}>
+              <h3 className="text-base font-semibold mb-2">Add a new delivery address</h3>
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Input label="Flat/House" placeholder="Flat No / Floor" error={errors.flatHouse?.message} {...register('flatHouse')} />
                 <Input label="Street" placeholder="Street Name" error={errors.street?.message} {...register('street')} />
               </div>
               <Input label="Area" placeholder="Area / Locality" error={errors.area?.message} {...register('area')} />
-              <div style={{ display: 'flex', gap: '1rem' }}>
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Input label="City" placeholder="City" error={errors.city?.message} {...register('city')} />
                 <Input label="State" placeholder="State" error={errors.state?.message} {...register('state')} />
               </div>
-              <div style={{ display: 'flex', gap: '1rem' }}>
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Input label="Pincode" placeholder="6-digit PIN" error={errors.pinCode?.message} {...register('pinCode')} />
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label className="input-label">Address Type</label>
-                  <select className="input-field" {...register('label')}>
+                <div className="flex-1 flex flex-col gap-1.5">
+                  <label className="text-sm font-medium text-secondary">Address Type</label>
+                  <select className="w-full h-[46px] px-4 text-base text-text-primary bg-gray-50 border-[1.5px] border-gray-200 rounded-md outline-none focus:bg-surface focus:border-primary focus:ring-4 focus:ring-primary/10" {...register('label')}>
                     <option value="Home">Home</option>
                     <option value="Work">Work</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+              <div className="flex gap-4 mt-2">
                 <Button type="submit">Save Address</Button>
                 {addresses.length > 0 && (
                   <Button type="button" variant="ghost" onClick={() => setIsAddingAddress(false)}>Cancel</Button>
@@ -324,26 +323,28 @@ export const Checkout = () => {
         </div>
         
         {/* Payment Method Selection */}
-        <div className="checkout-section">
-          <h2><ShieldCheck color="var(--primary)" size={24} /> Payment Method</h2>
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-border">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2"><ShieldCheck className="text-primary" size={24} /> Payment Method</h2>
+          <div className="flex flex-col sm:flex-row gap-4 mt-4">
+            <label className="flex items-center gap-2 cursor-pointer">
               <input 
                 type="radio" 
                 name="paymentMethod" 
                 value="online" 
                 checked={paymentMethod === 'online'} 
                 onChange={() => setPaymentMethod('online')} 
+                className="w-4 h-4 text-primary focus:ring-primary/20"
               />
               Pay Online (Razorpay)
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+            <label className="flex items-center gap-2 cursor-pointer">
               <input 
                 type="radio" 
                 name="paymentMethod" 
                 value="cod" 
                 checked={paymentMethod === 'cod'} 
-                onChange={() => setPaymentMethod('cod')} 
+                onChange={() => setPaymentMethod('cod')}
+                className="w-4 h-4 text-primary focus:ring-primary/20" 
               />
               Cash on Delivery (COD)
             </label>
@@ -352,21 +353,21 @@ export const Checkout = () => {
         
         {/* Payment Warning */}
         {paymentMethod === 'online' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '1rem' }}>
-            <ShieldCheck size={18} color="var(--success)" />
+          <div className="flex items-center gap-2 text-text-secondary text-sm mt-4">
+            <ShieldCheck size={18} className="text-success" />
             Payments are securely processed by Razorpay (Test Mode)
           </div>
         )}
       </div>
 
-      <div className="checkout-sidebar animate-slide-up" style={{ animationDelay: '0.1s' }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1.5rem' }}>Order Summary</h2>
+      <div className="w-full lg:w-[380px] shrink-0 bg-white rounded-xl shadow-md p-6 border border-border lg:sticky lg:top-[90px] animate-slide-up" style={{ animationDelay: '0.1s' }}>
+        <h2 className="text-xl font-bold mb-6">Order Summary</h2>
         
-        <div style={{ marginBottom: '1.5rem' }}>
+        <div className="mb-6 space-y-4">
           {items.map(item => (
-            <div key={item.id} className="summary-item">
-              <span style={{ flex: 1 }}>{item.quantity} x {item.name}</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div key={item.id} className="flex justify-between text-sm">
+              <span className="flex-1 pr-4">{item.quantity} x {item.name}</span>
+              <div className="flex items-center gap-4 shrink-0">
                 <span>₹{item.price * item.quantity}</span>
                 <button 
                   onClick={async () => {
@@ -377,7 +378,7 @@ export const Checkout = () => {
                       alert(err.message || 'Failed to remove item');
                     }
                   }}
-                  style={{ background: 'none', border: 'none', color: 'var(--error)', cursor: 'pointer', fontSize: '0.875rem', fontWeight: 600, padding: 0 }}
+                  className="bg-transparent border-none text-error cursor-pointer text-sm font-semibold p-0 hover:underline"
                   disabled={isProcessing}
                 >
                   Remove
@@ -388,57 +389,57 @@ export const Checkout = () => {
         </div>
 
         {/* Promo Code Section */}
-        <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--gray-50)', borderRadius: 'var(--radius-md)', border: '1px dashed var(--gray-300)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem', fontWeight: 600 }}>
-            <Tag size={18} color="var(--primary)" /> Apply Promo Code
+        <div className="mb-6 p-4 bg-gray-50 rounded-md border border-dashed border-gray-300">
+          <div className="flex items-center gap-2 mb-3 font-semibold text-text-primary">
+            <Tag size={18} className="text-primary" /> Apply Promo Code
           </div>
           
           {appliedCoupon ? (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--success-bg)', padding: '0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--success-border)' }}>
+            <div className="flex justify-between items-center bg-success-bg p-3 rounded-md border border-success/30">
               <div>
-                <div style={{ fontWeight: 600, color: 'var(--success)' }}>{appliedCoupon.code} applied!</div>
-                <div style={{ fontSize: '0.8rem', color: 'var(--success)' }}>You saved ₹{discountAmount.toFixed(2)}</div>
+                <div className="font-semibold text-success">{appliedCoupon.code} applied!</div>
+                <div className="text-xs text-success">You saved ₹{discountAmount.toFixed(2)}</div>
               </div>
-              <button onClick={removeCoupon} style={{ background: 'none', border: 'none', color: 'var(--error)', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>REMOVE</button>
+              <button onClick={removeCoupon} className="bg-transparent border-none text-error font-semibold cursor-pointer text-sm hover:underline">REMOVE</button>
             </div>
           ) : (
             <div>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <div className="flex gap-2">
                 <input 
                   type="text" 
                   placeholder="Enter code" 
                   value={couponCode} 
                   onChange={(e) => setCouponCode(e.target.value)}
-                  style={{ flex: 1, padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--gray-300)' }}
+                  className="flex-1 px-3 py-2 rounded-md border border-gray-300 outline-none focus:border-primary"
                 />
                 <Button size="sm" onClick={applyCoupon} isLoading={isApplyingCoupon} disabled={!couponCode.trim()}>APPLY</Button>
               </div>
-              {couponError && <div style={{ color: 'var(--error)', fontSize: '0.8rem', marginTop: '0.5rem' }}>{couponError}</div>}
+              {couponError && <div className="text-error text-xs mt-2">{couponError}</div>}
             </div>
           )}
         </div>
         
-        <div className="bill-details">
-          <div className="summary-item">
-            <span style={{ color: 'var(--text-secondary)' }}>Item Total</span>
+        <div className="bg-gray-50 p-4 rounded-md mb-6 space-y-4">
+          <div className="flex justify-between text-sm">
+            <span className="text-text-secondary">Item Total</span>
             <span>₹{subtotal.toFixed(2)}</span>
           </div>
           {discountAmount > 0 && (
-            <div className="summary-item" style={{ color: 'var(--success)' }}>
+            <div className="flex justify-between text-sm text-success">
               <span>Item Discount</span>
               <span>-₹{discountAmount.toFixed(2)}</span>
             </div>
           )}
-          <div className="summary-item">
-            <span style={{ color: 'var(--text-secondary)' }}>Delivery Fee</span>
-            <span>{deliveryFee === 0 ? <span style={{ color: 'var(--success)' }}>FREE</span> : `₹${deliveryFee.toFixed(2)}`}</span>
+          <div className="flex justify-between text-sm">
+            <span className="text-text-secondary">Delivery Fee</span>
+            <span>{deliveryFee === 0 ? <span className="text-success font-semibold">FREE</span> : `₹${deliveryFee.toFixed(2)}`}</span>
           </div>
-          <div className="summary-item">
-            <span style={{ color: 'var(--text-secondary)' }}>Govt Taxes (5%)</span>
+          <div className="flex justify-between text-sm">
+            <span className="text-text-secondary">Govt Taxes (5%)</span>
             <span>₹{tax.toFixed(2)}</span>
           </div>
           
-          <div className="summary-total">
+          <div className="flex justify-between text-lg font-bold pt-4 border-t border-dashed border-border mt-4">
             <span>To Pay</span>
             <span>₹{total.toFixed(2)}</span>
           </div>

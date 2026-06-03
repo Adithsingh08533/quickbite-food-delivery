@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Utensils, Search, ShoppingBag, LogOut, FileText, LayoutDashboard, Bell, Heart } from 'lucide-react';
+import { Utensils, Search, ShoppingBag, LogOut, FileText, LayoutDashboard, Bell, Heart, Menu, X } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { useCartStore } from '../../store/cartStore';
 import { useNotificationStore } from '../../store/notificationStore';
 import { Button } from '../ui/Button';
-import './Navbar.css';
 
 export const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -15,6 +14,7 @@ export const Navbar = () => {
   const location = useLocation();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +46,7 @@ export const Navbar = () => {
   const handleLogout = async () => {
     await logout();
     setIsDropdownOpen(false);
+    setIsMobileMenuOpen(false);
     navigate('/login');
   };
 
@@ -53,74 +54,99 @@ export const Navbar = () => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   };
 
+  const NavLinks = ({ mobile = false }: { mobile?: boolean }) => {
+    const linkClass = mobile 
+      ? "flex items-center gap-3 p-3 w-full text-text-secondary hover:text-primary hover:bg-gray-50 rounded-lg transition-colors font-medium" 
+      : "flex items-center gap-2 text-text-secondary hover:text-primary transition-colors font-medium";
+    const activeClass = "text-primary";
+
+    return (
+      <>
+        {user?.role === 'customer' || !isAuthenticated ? (
+          <>
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className={`${linkClass} ${location.pathname === '/' ? activeClass : ''}`}>
+              <Search size={20} />
+              <span>Explore</span>
+            </Link>
+            
+            <Link to="/checkout" onClick={() => setIsMobileMenuOpen(false)} className={`relative ${linkClass} ${location.pathname === '/checkout' ? activeClass : ''}`}>
+              <div className="relative flex items-center">
+                <ShoppingBag size={20} />
+                {cartItemsCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border-2 border-surface animate-fade-in">
+                    {cartItemsCount}
+                  </span>
+                )}
+              </div>
+              <span>Cart</span>
+            </Link>
+
+            {isAuthenticated && user?.role === 'customer' && (
+              <Link to="/orders" onClick={() => setIsMobileMenuOpen(false)} className={`${linkClass} ${location.pathname === '/orders' ? activeClass : ''}`}>
+                <FileText size={20} />
+                <span>Orders</span>
+              </Link>
+            )}
+          </>
+        ) : null}
+      </>
+    );
+  };
+
   return (
-    <header className="navbar">
-      <div className="container">
-        <Link to="/" className="navbar-brand">
+    <header className="sticky top-0 z-50 h-[70px] bg-surface shadow-sm flex items-center">
+      <div className="container mx-auto px-4 flex justify-between items-center w-full">
+        <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-primary hover:opacity-90 transition-opacity">
           <Utensils size={28} />
           <span>QuickBite</span>
         </Link>
 
-        <nav className="navbar-links">
-          {user?.role === 'customer' || !isAuthenticated ? (
-            <>
-              <Link to="/" className={`navbar-link ${location.pathname === '/' ? 'active' : ''}`}>
-                <Search size={20} />
-                <span>Explore</span>
-              </Link>
-              
-              <Link to="/checkout" className={`navbar-link cart-icon-wrapper ${location.pathname === '/checkout' ? 'active' : ''}`}>
-                <ShoppingBag size={20} />
-                <span>Cart</span>
-                {cartItemsCount > 0 && <span className="cart-badge animate-fade-in">{cartItemsCount}</span>}
-              </Link>
-
-              {isAuthenticated && user?.role === 'customer' && (
-                <Link to="/orders" className={`navbar-link ${location.pathname === '/orders' ? 'active' : ''}`}>
-                  <FileText size={20} />
-                  <span>Orders</span>
-                </Link>
-              )}
-            </>
-          ) : null}
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-8">
+          <div className="flex items-center gap-6">
+            <NavLinks />
+          </div>
 
           {isAuthenticated && user ? (
-            <div className="d-flex align-center gap-3">
-              <div className="user-menu" ref={notifRef}>
+            <div className="flex items-center gap-4">
+              <div className="relative" ref={notifRef}>
                 <button 
-                  className="navbar-link cart-icon-wrapper" style={{ background: 'none', border: 'none', padding: 0 }}
+                  className="relative p-2 text-text-secondary hover:text-primary transition-colors focus:outline-none"
                   onClick={() => setIsNotifOpen(!isNotifOpen)}
                 >
-                  <Bell size={20} />
-                  {unreadCount > 0 && <span className="cart-badge animate-fade-in">{unreadCount}</span>}
+                  <Bell size={22} />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border-2 border-surface animate-fade-in">
+                      {unreadCount}
+                    </span>
+                  )}
                 </button>
 
                 {isNotifOpen && (
-                  <div className="dropdown-menu notif-dropdown">
-                    <div className="dropdown-header d-flex justify-between align-center" style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--gray-200)' }}>
-                      <h4 style={{ margin: 0, fontSize: '0.9rem' }}>Notifications</h4>
+                  <div className="absolute right-0 mt-2 w-80 bg-surface rounded-lg shadow-lg border border-border overflow-hidden animate-slide-up origin-top-right z-50">
+                    <div className="flex justify-between items-center p-3 border-b border-border">
+                      <h4 className="m-0 text-sm font-semibold text-text-primary">Notifications</h4>
                       {unreadCount > 0 && (
-                        <button onClick={markAllAsRead} style={{ background: 'none', border: 'none', color: 'var(--primary)', fontSize: '0.8rem', cursor: 'pointer' }}>
+                        <button onClick={markAllAsRead} className="text-xs text-primary hover:underline font-medium">
                           Mark all read
                         </button>
                       )}
                     </div>
-                    <div className="notif-list" style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                    <div className="max-h-[300px] overflow-y-auto">
                       {notifications.length === 0 ? (
-                        <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--gray-500)', fontSize: '0.9rem' }}>No notifications yet</div>
+                        <div className="p-4 text-center text-sm text-text-muted">No notifications yet</div>
                       ) : (
                         notifications.map(notif => (
                           <div 
                             key={notif.id} 
-                            className={`dropdown-item ${!notif.is_read ? 'unread' : ''}`}
                             onClick={() => {
                               if (!notif.is_read) markAsRead(notif.id);
                               setIsNotifOpen(false);
                             }}
-                            style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', padding: '0.75rem 1rem', borderBottom: '1px solid var(--gray-100)', backgroundColor: notif.is_read ? 'transparent' : 'var(--primary-light)', cursor: 'pointer' }}
+                            className={`flex flex-col p-3 border-b border-border cursor-pointer transition-colors ${!notif.is_read ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-gray-50'}`}
                           >
-                            <div style={{ fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.25rem', color: notif.is_read ? 'var(--gray-700)' : 'var(--gray-900)' }}>{notif.title}</div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--gray-500)' }}>{notif.body}</div>
+                            <div className={`text-sm mb-1 ${!notif.is_read ? 'font-semibold text-text-primary' : 'font-medium text-text-secondary'}`}>{notif.title}</div>
+                            <div className="text-xs text-text-secondary line-clamp-2">{notif.body}</div>
                           </div>
                         ))
                       )}
@@ -129,62 +155,62 @@ export const Navbar = () => {
                 )}
               </div>
 
-              <div className="user-menu" ref={dropdownRef}>
-              <button 
-                className="user-menu-btn"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              >
-                <div className="user-avatar">
-                  {user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt={user.name} />
-                  ) : (
-                    getInitials(user.name)
-                  )}
-                </div>
-                <span>{user.name.split(' ')[0]}</span>
-              </button>
+              <div className="relative" ref={dropdownRef}>
+                <button 
+                  className="flex items-center gap-2 p-1.5 pr-3 rounded-full hover:bg-gray-100 transition-colors"
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm overflow-hidden border border-primary/20">
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      getInitials(user.name)
+                    )}
+                  </div>
+                  <span className="font-medium text-sm text-text-primary hidden lg:block">{user.name.split(' ')[0]}</span>
+                </button>
 
-              {isDropdownOpen && (
-                <div className="dropdown-menu">
-                  {user.role === 'customer' && (
-                    <>
-                      <Link to="/orders" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
-                        <FileText size={18} />
-                        My Orders
+                {isDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-surface rounded-lg shadow-lg border border-border overflow-hidden animate-slide-up origin-top-right z-50">
+                    {user.role === 'customer' && (
+                      <>
+                        <Link to="/orders" className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary hover:bg-gray-50 hover:text-primary transition-colors" onClick={() => setIsDropdownOpen(false)}>
+                          <FileText size={16} />
+                          My Orders
+                        </Link>
+                        <Link to="/favorites" className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary hover:bg-gray-50 hover:text-primary transition-colors" onClick={() => setIsDropdownOpen(false)}>
+                          <Heart size={16} />
+                          Favorites
+                        </Link>
+                      </>
+                    )}
+                    {user.role === 'owner' && (
+                      <Link to="/owner" className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary hover:bg-gray-50 hover:text-primary transition-colors" onClick={() => setIsDropdownOpen(false)}>
+                        <LayoutDashboard size={16} />
+                        Owner Dashboard
                       </Link>
-                      <Link to="/favorites" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
-                        <Heart size={18} />
-                        Favorites
+                    )}
+                    {user.role === 'admin' && (
+                      <Link to="/admin" className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary hover:bg-gray-50 hover:text-primary transition-colors" onClick={() => setIsDropdownOpen(false)}>
+                        <LayoutDashboard size={16} />
+                        Admin Panel
                       </Link>
-                    </>
-                  )}
-                  {user.role === 'owner' && (
-                    <Link to="/owner" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
-                      <LayoutDashboard size={18} />
-                      Owner Dashboard
-                    </Link>
-                  )}
-                  {user.role === 'admin' && (
-                    <Link to="/admin" className="dropdown-item" onClick={() => setIsDropdownOpen(false)}>
-                      <LayoutDashboard size={18} />
-                      Admin Panel
-                    </Link>
-                  )}
-                  
-                  <div className="dropdown-divider" />
-                  
-                  <button className="dropdown-item" onClick={handleLogout}>
-                    <LogOut size={18} color="var(--error)" />
-                    <span style={{ color: 'var(--error)' }}>Logout</span>
-                  </button>
-                </div>
-              )}
+                    )}
+                    
+                    <div className="h-px bg-border my-1" />
+                    
+                    <button className="flex w-full items-center gap-3 px-4 py-3 text-sm text-error hover:bg-error/5 transition-colors" onClick={handleLogout}>
+                      <LogOut size={16} />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
-            <div className="d-flex align-center gap-2">
+            <div className="flex items-center gap-3">
               <Link to="/login">
-                <Button variant="ghost">Login</Button>
+                <Button variant="ghost" className="hidden lg:block">Login</Button>
               </Link>
               <Link to="/register">
                 <Button variant="primary">Sign Up</Button>
@@ -192,7 +218,135 @@ export const Navbar = () => {
             </div>
           )}
         </nav>
+
+        {/* Mobile Menu Toggle & Notifications */}
+        <div className="flex items-center gap-4 md:hidden">
+          {isAuthenticated && user && (
+             <div className="relative" ref={notifRef}>
+                <button 
+                  className="relative p-2 text-text-secondary hover:text-primary transition-colors focus:outline-none"
+                  onClick={() => setIsNotifOpen(!isNotifOpen)}
+                >
+                  <Bell size={22} />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border-2 border-surface animate-fade-in">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {isNotifOpen && (
+                  <div className="absolute right-0 mt-2 w-[calc(100vw-2rem)] max-w-sm bg-surface rounded-lg shadow-xl border border-border overflow-hidden animate-slide-up origin-top-right z-50">
+                    <div className="flex justify-between items-center p-3 border-b border-border">
+                      <h4 className="m-0 text-sm font-semibold text-text-primary">Notifications</h4>
+                      {unreadCount > 0 && (
+                        <button onClick={markAllAsRead} className="text-xs text-primary hover:underline font-medium">
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-[300px] overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-4 text-center text-sm text-text-muted">No notifications yet</div>
+                      ) : (
+                        notifications.map(notif => (
+                          <div 
+                            key={notif.id} 
+                            onClick={() => {
+                              if (!notif.is_read) markAsRead(notif.id);
+                              setIsNotifOpen(false);
+                            }}
+                            className={`flex flex-col p-3 border-b border-border cursor-pointer transition-colors ${!notif.is_read ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-gray-50'}`}
+                          >
+                            <div className={`text-sm mb-1 ${!notif.is_read ? 'font-semibold text-text-primary' : 'font-medium text-text-secondary'}`}>{notif.title}</div>
+                            <div className="text-xs text-text-secondary line-clamp-2">{notif.body}</div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+             </div>
+          )}
+          
+          <button 
+            className="p-2 text-text-secondary hover:text-primary transition-colors focus:outline-none"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="absolute top-[70px] left-0 w-full bg-surface border-t border-border shadow-md md:hidden flex flex-col py-2 z-40 animate-slide-up">
+          <div className="px-4 py-2 space-y-1">
+            <NavLinks mobile={true} />
+          </div>
+          
+          {isAuthenticated && user ? (
+            <>
+              <div className="h-px bg-border my-2 mx-4" />
+              <div className="px-4 py-2">
+                <div className="flex items-center gap-3 px-3 py-2 mb-2">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm overflow-hidden border border-primary/20">
+                    {user.avatarUrl ? (
+                      <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                      getInitials(user.name)
+                    )}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-text-primary text-sm">{user.name}</div>
+                    <div className="text-xs text-text-muted capitalize">{user.role}</div>
+                  </div>
+                </div>
+                
+                {user.role === 'customer' && (
+                  <>
+                    <Link to="/orders" className="flex items-center gap-3 p-3 w-full text-text-secondary hover:text-primary hover:bg-gray-50 rounded-lg transition-colors font-medium text-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                      <FileText size={18} />
+                      My Orders
+                    </Link>
+                    <Link to="/favorites" className="flex items-center gap-3 p-3 w-full text-text-secondary hover:text-primary hover:bg-gray-50 rounded-lg transition-colors font-medium text-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Heart size={18} />
+                      Favorites
+                    </Link>
+                  </>
+                )}
+                {user.role === 'owner' && (
+                  <Link to="/owner" className="flex items-center gap-3 p-3 w-full text-text-secondary hover:text-primary hover:bg-gray-50 rounded-lg transition-colors font-medium text-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                    <LayoutDashboard size={18} />
+                    Owner Dashboard
+                  </Link>
+                )}
+                {user.role === 'admin' && (
+                  <Link to="/admin" className="flex items-center gap-3 p-3 w-full text-text-secondary hover:text-primary hover:bg-gray-50 rounded-lg transition-colors font-medium text-sm" onClick={() => setIsMobileMenuOpen(false)}>
+                    <LayoutDashboard size={18} />
+                    Admin Panel
+                  </Link>
+                )}
+                
+                <button className="flex w-full items-center gap-3 p-3 mt-2 text-sm text-error hover:bg-error/5 rounded-lg transition-colors font-medium" onClick={handleLogout}>
+                  <LogOut size={18} />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className="px-4 py-3 flex flex-col gap-2 border-t border-border mt-2">
+              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="outline" className="w-full justify-center">Login</Button>
+              </Link>
+              <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                <Button variant="primary" className="w-full justify-center">Sign Up</Button>
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 };

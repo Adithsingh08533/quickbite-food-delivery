@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, X } from 'lucide-react';
 import { api } from '../../services/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -105,114 +105,133 @@ export const MenuManager = () => {
     }
   };
 
-  if (loading) return <div>Loading menu...</div>;
-  if (!restaurantId) return <div className="dashboard-card">Please register your restaurant first on the Dashboard.</div>;
+  if (loading) return <div className="p-8 text-center text-text-secondary">Loading menu...</div>;
+  if (!restaurantId) return <div className="p-8 text-center text-text-secondary">Please register your restaurant first on the Dashboard.</div>;
 
   return (
     <div className="animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Menu Manager</h1>
-        <Button onClick={() => openModal()}><Plus size={18} /> Add New Item</Button>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <h1 className="text-2xl font-bold text-text-primary">Menu Manager</h1>
+        <Button onClick={() => openModal()} className="w-full sm:w-auto flex items-center justify-center gap-2">
+          <Plus size={18} /> Add New Item
+        </Button>
       </div>
 
-      <div className="dashboard-card" style={{ padding: 0, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
-              <th style={{ padding: '1rem 1.5rem', width: 80 }}>Image</th>
-              <th style={{ padding: '1rem 1.5rem' }}>Name & Description</th>
-              <th style={{ padding: '1rem 1.5rem', width: 100 }}>Type</th>
-              <th style={{ padding: '1rem 1.5rem', width: 120 }}>Price</th>
-              <th style={{ padding: '1rem 1.5rem', width: 150, textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {foodItems.length === 0 ? (
-              <tr>
-                <td colSpan={5} style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                  No items in your menu yet. Add some delicious dishes!
-                </td>
+      <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse min-w-[700px]">
+            <thead>
+              <tr className="bg-gray-50 border-b border-border text-left text-text-secondary text-sm">
+                <th className="p-4 font-semibold w-24 whitespace-nowrap">Image</th>
+                <th className="p-4 font-semibold">Name & Description</th>
+                <th className="p-4 font-semibold w-32 whitespace-nowrap">Type</th>
+                <th className="p-4 font-semibold w-32 whitespace-nowrap">Price</th>
+                <th className="p-4 font-semibold w-40 text-right whitespace-nowrap">Actions</th>
               </tr>
-            ) : (
-              foodItems.map(item => (
-                <tr key={item.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <td style={{ padding: '1rem 1.5rem' }}>
-                    <div style={{ width: 60, height: 60, borderRadius: 'var(--radius-md)', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9ca3af', overflow: 'hidden' }}>
-                      <img 
-                        src={item.imageUrl || '/images/foods/veg-burger.jpg'} 
-                        alt={item.name} 
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/images/foods/veg-burger.jpg';
-                        }}
-                      />
-                    </div>
-                  </td>
-                  <td style={{ padding: '1rem 1.5rem' }}>
-                    <div style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: 4 }}>{item.name}</div>
-                    <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{item.description}</div>
-                  </td>
-                  <td style={{ padding: '1rem 1.5rem' }}>
-                    <span style={{ 
-                      padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600,
-                      background: item.isVeg ? '#dcfce7' : '#fee2e2',
-                      color: item.isVeg ? '#16a34a' : '#ef4444'
-                    }}>
-                      {item.isVeg ? 'VEG' : 'NON-VEG'}
-                    </span>
-                  </td>
-                  <td style={{ padding: '1rem 1.5rem', fontWeight: 600 }}>₹{item.price}</td>
-                  <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                      <Button variant="ghost" size="sm" onClick={() => openModal(item)}><Edit2 size={16} /></Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)} style={{ color: 'var(--error)' }}><Trash2 size={16} /></Button>
-                    </div>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {foodItems.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="p-12 text-center text-text-secondary">
+                    No items in your menu yet. Add some delicious dishes!
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                foodItems.map(item => (
+                  <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="p-4">
+                      <div className="w-16 h-16 rounded-md bg-gray-100 flex items-center justify-center text-gray-400 overflow-hidden shrink-0 border border-border shadow-sm">
+                        <img 
+                          src={item.imageUrl || '/images/foods/veg-burger.jpg'} 
+                          alt={item.name} 
+                          className="w-full h-full object-cover" 
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/images/foods/veg-burger.jpg';
+                          }}
+                        />
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <div className="font-bold text-text-primary mb-1">{item.name}</div>
+                      <div className="text-sm text-text-secondary line-clamp-2">{item.description}</div>
+                    </td>
+                    <td className="p-4 whitespace-nowrap">
+                      <span className={`px-2.5 py-1 rounded-md text-xs font-bold tracking-wide uppercase ${
+                        item.isVeg ? 'bg-success-bg text-success' : 'bg-error-bg text-error'
+                      }`}>
+                        {item.isVeg ? 'VEG' : 'NON-VEG'}
+                      </span>
+                    </td>
+                    <td className="p-4 font-bold text-text-primary whitespace-nowrap">₹{item.price}</td>
+                    <td className="p-4 text-right whitespace-nowrap">
+                      <div className="flex gap-2 justify-end">
+                        <Button variant="ghost" size="sm" onClick={() => openModal(item)} className="px-2 h-8">
+                          <Edit2 size={16} />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDelete(item.id)} className="px-2 h-8 text-error hover:bg-error-bg hover:text-error">
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Modal */}
       {isModalOpen && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-          <div className="dashboard-card animate-slide-up" style={{ width: '100%', maxWidth: 500, padding: '2rem' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>{editingItem ? 'Edit Item' : 'Add New Item'}</h2>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1000] p-4">
+          <div className="bg-white rounded-xl w-full max-w-lg shadow-xl animate-slide-up flex flex-col max-h-[90vh]">
+            <div className="flex justify-between items-center p-6 border-b border-border">
+              <h2 className="text-xl font-bold text-text-primary">{editingItem ? 'Edit Item' : 'Add New Item'}</h2>
+              <button 
+                onClick={() => setIsModalOpen(false)}
+                className="text-text-muted hover:text-text-primary transition-colors focus:outline-none"
+              >
+                <X size={24} />
+              </button>
+            </div>
             
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <Input label="Item Name" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label className="input-label">Description</label>
-                <textarea 
-                  className="input-field" 
-                  style={{ height: 'auto', padding: '12px', resize: 'vertical', minHeight: 80 }} 
-                  required 
-                  value={formData.description} 
-                  onChange={e => setFormData({...formData, description: e.target.value})} 
-                />
-              </div>
-              
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <div style={{ flex: 1 }}>
-                  <Input label="Price (₹)" type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+            <div className="p-6 overflow-y-auto flex-1">
+              <form id="menu-form" onSubmit={handleSubmit} className="flex flex-col gap-5">
+                <Input label="Item Name" required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+                
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-semibold text-text-primary">Description</label>
+                  <textarea 
+                    className="w-full p-3 rounded-md border border-gray-300 min-h-[100px] resize-y outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-base" 
+                    required 
+                    value={formData.description} 
+                    onChange={e => setFormData({...formData, description: e.target.value})} 
+                  />
                 </div>
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <label className="input-label">Type</label>
-                  <select className="input-field" value={formData.isVeg ? 'true' : 'false'} onChange={e => setFormData({...formData, isVeg: e.target.value === 'true'})}>
-                    <option value="true">Vegetarian</option>
-                    <option value="false">Non-Vegetarian</option>
-                  </select>
+                
+                <div className="flex flex-col sm:flex-row gap-5">
+                  <div className="flex-1">
+                    <Input label="Price (₹)" type="number" step="0.01" required value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+                  </div>
+                  <div className="flex-1 flex flex-col gap-1.5">
+                    <label className="text-sm font-semibold text-text-primary">Type</label>
+                    <select 
+                      className="w-full p-3 rounded-md border border-gray-300 outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all bg-white text-base h-[48px]" 
+                      value={formData.isVeg ? 'true' : 'false'} 
+                      onChange={e => setFormData({...formData, isVeg: e.target.value === 'true'})}
+                    >
+                      <option value="true">Vegetarian</option>
+                      <option value="false">Non-Vegetarian</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-              
-              <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <Button type="button" variant="outline" fullWidth onClick={() => setIsModalOpen(false)}>Cancel</Button>
-                <Button type="submit" fullWidth>Save Item</Button>
-              </div>
-            </form>
+              </form>
+            </div>
+            
+            <div className="p-6 border-t border-border flex flex-col sm:flex-row justify-end gap-3 bg-gray-50 rounded-b-xl">
+              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="w-full sm:w-auto">Cancel</Button>
+              <Button type="submit" form="menu-form" className="w-full sm:w-auto">Save Item</Button>
+            </div>
           </div>
         </div>
       )}

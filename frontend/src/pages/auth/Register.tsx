@@ -8,7 +8,6 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../store/authStore';
 import { api } from '../../services/api';
-import './auth.css';
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -56,46 +55,42 @@ export const Register = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-left" style={{ padding: '1rem 2rem' }}>
-        <Link to="/" className="auth-logo" style={{ top: '1.5rem', left: '1.5rem', fontSize: '1.2rem' }}>
-          <Utensils color="var(--primary)" size={24} />
+    <div className="min-h-screen flex bg-gray-50">
+      <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-8 bg-white relative">
+        <Link to="/" className="absolute top-6 md:top-8 left-6 md:left-8 text-xl md:text-2xl font-bold text-primary flex items-center gap-2">
+          <Utensils color="currentColor" size={24} />
           QuickBite
         </Link>
         
-        <div className="auth-form-wrapper" style={{ marginTop: '2rem' }}>
-          <h1 className="auth-title">Create an account</h1>
-          <p className="auth-subtitle">Join us to start ordering or selling</p>
+        <div className="w-full max-w-[400px] animate-slide-up mt-16 md:mt-0 py-8">
+          <h1 className="text-3xl font-bold mb-2 text-text-primary">Create an account</h1>
+          <p className="text-text-secondary mb-6 md:mb-8">Join us to start ordering or selling</p>
           
-          <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
+          <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
             {serverError && (
-              <div style={{ padding: '12px', background: 'var(--error-bg)', color: 'var(--error)', borderRadius: 'var(--radius-md)', fontSize: '0.875rem' }}>
+              <div className="p-3 bg-error-bg text-error rounded-md text-sm border border-error/20">
                 {serverError}
               </div>
             )}
             
-            <div style={{ display: 'flex', gap: '10px', marginBottom: '8px' }}>
-              <label style={{ flex: 1, cursor: 'pointer' }}>
-                <input type="radio" value="customer" {...register('role')} style={{ display: 'none' }} />
-                <div style={{
-                  padding: '10px', textAlign: 'center', borderRadius: 'var(--radius-md)',
-                  border: `2px solid ${selectedRole === 'customer' ? 'var(--primary)' : 'var(--border-color)'}`,
-                  background: selectedRole === 'customer' ? 'var(--primary-light)' : 'transparent',
-                  fontWeight: selectedRole === 'customer' ? '600' : '400',
-                  color: selectedRole === 'customer' ? 'var(--primary)' : 'var(--text-secondary)'
-                }}>
+            <div className="flex gap-3 mb-2">
+              <label className="flex-1 cursor-pointer">
+                <input type="radio" value="customer" {...register('role')} className="hidden" />
+                <div className={`p-2.5 text-center rounded-md border-2 transition-colors ${
+                  selectedRole === 'customer' 
+                    ? 'border-primary bg-primary/10 font-semibold text-primary' 
+                    : 'border-border bg-transparent font-normal text-text-secondary hover:border-gray-300'
+                }`}>
                   I'm a Customer
                 </div>
               </label>
-              <label style={{ flex: 1, cursor: 'pointer' }}>
-                <input type="radio" value="owner" {...register('role')} style={{ display: 'none' }} />
-                <div style={{
-                  padding: '10px', textAlign: 'center', borderRadius: 'var(--radius-md)',
-                  border: `2px solid ${selectedRole === 'owner' ? 'var(--primary)' : 'var(--border-color)'}`,
-                  background: selectedRole === 'owner' ? 'var(--primary-light)' : 'transparent',
-                  fontWeight: selectedRole === 'owner' ? '600' : '400',
-                  color: selectedRole === 'owner' ? 'var(--primary)' : 'var(--text-secondary)'
-                }}>
+              <label className="flex-1 cursor-pointer">
+                <input type="radio" value="owner" {...register('role')} className="hidden" />
+                <div className={`p-2.5 text-center rounded-md border-2 transition-colors ${
+                  selectedRole === 'owner' 
+                    ? 'border-primary bg-primary/10 font-semibold text-primary' 
+                    : 'border-border bg-transparent font-normal text-text-secondary hover:border-gray-300'
+                }`}>
                   I'm an Owner
                 </div>
               </label>
@@ -135,23 +130,26 @@ export const Register = () => {
               {...register('password')}
             />
             
-            <Button type="submit" fullWidth isLoading={isSubmitting}>
+            <Button type="submit" fullWidth className="mt-2" isLoading={isSubmitting}>
               Create Account
             </Button>
           </form>
           
-          <div className="auth-footer">
-            Already have an account? <Link to="/login">Log in</Link>
+          <div className="mt-6 text-center text-text-secondary text-sm pb-8 md:pb-0">
+            Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Log in</Link>
           </div>
         </div>
       </div>
       
-      <div className="auth-right">
-        <div className="auth-shape shape-1" />
-        <div className="auth-shape shape-2" />
-        <div className="auth-glass-card">
-          <h2>{selectedRole === 'owner' ? 'Partner with us.' : 'Discover new flavors.'}</h2>
-          <p>
+      <div className="hidden md:flex flex-1 flex-col justify-center items-center bg-gradient-to-br from-primary to-[#ff8a00] text-white p-16 relative overflow-hidden">
+        <div className="absolute rounded-full bg-white/10 w-[300px] h-[300px] -top-[100px] -right-[50px]" />
+        <div className="absolute rounded-full bg-white/10 w-[200px] h-[200px] -bottom-[50px] -left-[50px]" />
+        
+        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-10 max-w-[450px] shadow-2xl animate-slide-up z-10">
+          <h2 className="text-4xl font-bold leading-tight mb-4 text-white">
+            {selectedRole === 'owner' ? 'Partner with us.' : 'Discover new flavors.'}
+          </h2>
+          <p className="text-lg opacity-90 leading-relaxed text-white/90">
             {selectedRole === 'owner' 
               ? 'Grow your business by reaching thousands of hungry customers every day.' 
               : 'Sign up to explore top-rated restaurants and get fast delivery.'}

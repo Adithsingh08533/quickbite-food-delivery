@@ -3,27 +3,22 @@ import { Navbar } from './Navbar';
 
 export const MainLayout = () => {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main style={{ flex: 1 }}>
+      <main className="flex-1">
         <Outlet />
       </main>
       
-      {/* Simple Footer */}
-      <footer style={{ 
-        backgroundColor: 'var(--surface-color)', 
-        borderTop: '1px solid var(--border-color)',
-        padding: '2rem 0',
-        marginTop: 'auto'
-      }}>
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Footer */}
+      <footer className="bg-surface border-t border-border py-8 mt-auto">
+        <div className="container mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
           <div>
-            <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)' }}>QuickBite</span>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+            <span className="text-xl font-bold text-primary">QuickBite</span>
+            <p className="text-text-secondary text-sm mt-2">
               Delivering happiness, one meal at a time.
             </p>
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+          <div className="text-text-muted text-sm">
             &copy; {new Date().getFullYear()} QuickBite. All rights reserved.
           </div>
         </div>
@@ -31,3 +26,4 @@ export const MainLayout = () => {
     </div>
   );
 };
+

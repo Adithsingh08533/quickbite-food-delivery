@@ -1,68 +1,101 @@
+import { useState } from 'react';
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
-import { LayoutDashboard, CheckSquare, LogOut, ShieldAlert } from 'lucide-react';
+import { LayoutDashboard, CheckSquare, LogOut, ShieldAlert, Menu as MenuIcon, X } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import './OwnerLayout.css'; // Reusing layout CSS
 
 export const AdminLayout = () => {
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
+  const SidebarContent = () => (
+    <>
+      <Link to="/" className="h-[70px] flex items-center px-6 text-2xl font-bold text-blue-400 border-b border-white/10 gap-2">
+        <ShieldAlert size={24} />
+        <span className="text-xl">Admin Portal</span>
+      </Link>
+      
+      <nav className="flex-1 py-6 px-4 flex flex-col gap-2">
+        <NavLink 
+          to="/admin" 
+          end
+          onClick={() => setIsSidebarOpen(false)}
+          className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 font-medium transition-colors ${isActive ? 'bg-blue-500 text-white' : 'hover:bg-white/5 hover:text-white'}`}
+        >
+          <LayoutDashboard size={20} />
+          Overview
+        </NavLink>
+        <NavLink 
+          to="/admin/approvals" 
+          onClick={() => setIsSidebarOpen(false)}
+          className={({ isActive }) => `flex items-center gap-4 px-4 py-3 rounded-lg text-gray-300 font-medium transition-colors ${isActive ? 'bg-blue-500 text-white' : 'hover:bg-white/5 hover:text-white'}`}
+        >
+          <CheckSquare size={20} />
+          Pending Approvals
+        </NavLink>
+      </nav>
+      
+      <div className="p-6 border-t border-white/10">
+        <button 
+          className="flex items-center gap-2 w-full px-4 py-2 text-red-300 font-semibold rounded-lg transition-colors hover:bg-red-500/10 hover:text-red-500" 
+          onClick={handleLogout}
+        >
+          <LogOut size={20} />
+          Log Out
+        </button>
+      </div>
+    </>
+  );
+
   return (
-    <div className="owner-layout">
+    <div className="flex min-h-screen bg-background">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="owner-sidebar" style={{ backgroundColor: '#111827' }}>
-        <Link to="/" className="owner-brand" style={{ color: '#60a5fa' }}>
-          <ShieldAlert size={24} />
-          Admin Portal
-        </Link>
-        
-        <nav className="owner-nav">
-          <NavLink 
-            to="/admin" 
-            end
-            className={({ isActive }) => `owner-nav-link ${isActive ? 'active' : ''}`}
-            style={({ isActive }) => isActive ? { backgroundColor: '#3b82f6' } : {}}
-          >
-            <LayoutDashboard size={20} />
-            Overview
-          </NavLink>
-          <NavLink 
-            to="/admin/approvals" 
-            className={({ isActive }) => `owner-nav-link ${isActive ? 'active' : ''}`}
-            style={({ isActive }) => isActive ? { backgroundColor: '#3b82f6' } : {}}
-          >
-            <CheckSquare size={20} />
-            Pending Approvals
-          </NavLink>
-        </nav>
-        
-        <div className="owner-footer">
-          <button className="owner-logout" onClick={handleLogout}>
-            <LogOut size={20} />
-            Log Out
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white flex flex-col transition-transform duration-300 ease-in-out lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="absolute top-4 right-4 lg:hidden">
+          <button onClick={() => setIsSidebarOpen(false)} className="text-gray-300 hover:text-white">
+            <X size={24} />
           </button>
         </div>
+        <SidebarContent />
       </aside>
 
-      <main className="owner-main">
-        <header className="owner-header">
-          <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>System Administration</h2>
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col min-w-0 lg:ml-64">
+        <header className="sticky top-0 z-30 h-[70px] bg-surface shadow-sm flex items-center justify-between px-4 lg:px-8">
+          <div className="flex items-center gap-4">
+            <button 
+              className="lg:hidden text-text-secondary hover:text-primary"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <MenuIcon size={24} />
+            </button>
+            <h2 className="text-lg lg:text-xl font-semibold truncate hidden sm:block">System Administration</h2>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', backgroundColor: '#dbeafe', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
-              A
+          
+          <div className="flex items-center gap-4 lg:gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
+                {user?.name.charAt(0) || 'A'}
+              </div>
+              <span className="font-medium hidden sm:block">{user?.name}</span>
             </div>
-            <span style={{ fontWeight: 500 }}>{user?.name}</span>
           </div>
         </header>
 
-        <div className="owner-content">
+        <div className="p-4 lg:p-8 flex-1 overflow-x-hidden">
           <Outlet />
         </div>
       </main>

@@ -42,50 +42,50 @@ export const Approvals = () => {
 
   const pendingRestaurants = restaurants.filter(r => r.approvalStatus === 'pending');
 
-  if (loading) return <div>Loading pending approvals...</div>;
+  if (loading) return <div className="p-16 text-center text-text-secondary">Loading pending approvals...</div>;
 
   return (
     <div className="animate-fade-in">
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '2rem' }}>Pending Approvals</h1>
+      <h1 className="text-2xl font-bold text-text-primary mb-8">Pending Approvals</h1>
 
       {pendingRestaurants.length === 0 ? (
-        <div className="dashboard-card" style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--text-secondary)' }}>
-          <Store size={48} style={{ opacity: 0.5, margin: '0 auto 1rem' }} />
-          <h3>All caught up!</h3>
+        <div className="bg-white rounded-xl border border-border shadow-sm p-16 text-center text-text-secondary">
+          <Store size={48} className="opacity-50 mx-auto mb-4" />
+          <h3 className="text-xl font-bold text-text-primary mb-2">All caught up!</h3>
           <p>There are no pending restaurant applications to review at this time.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gap: '1.5rem' }}>
+        <div className="grid grid-cols-1 gap-6">
           {pendingRestaurants.map(r => (
-            <div key={r.id} className="dashboard-card animate-slide-up" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.25rem' }}>{r.name}</h3>
+            <div key={r.id} className="bg-white rounded-xl border border-border shadow-sm p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 animate-slide-up hover:shadow-md transition-shadow">
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-text-primary mb-1">{r.name}</h3>
                 
-                <div style={{ display: 'grid', gap: '0.5rem', marginTop: '0.75rem', marginBottom: '0.75rem', color: 'var(--text-secondary)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <User size={16} /> <span>{r.ownerName || 'Unknown Owner'}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 mb-4 text-sm text-text-secondary">
+                  <div className="flex items-center gap-2">
+                    <User size={16} className="text-primary" /> <span className="font-medium">{r.ownerName || 'Unknown Owner'}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Mail size={16} /> <span>{r.ownerEmail || 'No email provided'}</span>
+                  <div className="flex items-center gap-2">
+                    <Mail size={16} className="text-primary" /> <span className="font-medium">{r.ownerEmail || 'No email provided'}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Phone size={16} /> <span>{r.ownerPhone || r.phone || 'No phone provided'}</span>
+                  <div className="flex items-center gap-2">
+                    <Phone size={16} className="text-primary" /> <span className="font-medium">{r.ownerPhone || r.phone || 'No phone provided'}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <MapPin size={16} /> <span>{r.address}, {r.city}</span>
+                  <div className="flex items-center gap-2">
+                    <MapPin size={16} className="text-primary" /> <span className="font-medium">{r.address}, {r.city}</span>
                   </div>
                 </div>
 
-                <div style={{ fontSize: '0.875rem', color: 'var(--text-muted)' }}>
-                  Registered on {new Date(r.createdAt).toLocaleDateString()}
+                <div className="text-xs font-medium text-text-muted bg-gray-50 inline-block px-2.5 py-1 rounded">
+                  Registered on {new Date(r.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <Button variant="outline" style={{ borderColor: 'var(--error)', color: 'var(--error)' }} onClick={() => handleApproval(r.id, 'reject')}>
-                  <X size={18} /> Reject
+              <div className="flex flex-row md:flex-col lg:flex-row gap-3 w-full md:w-auto mt-4 md:mt-0">
+                <Button variant="outline" className="flex-1 md:flex-none justify-center border-error text-error hover:bg-error-bg" onClick={() => handleApproval(r.id, 'reject')}>
+                  <X size={18} className="mr-1.5" /> Reject
                 </Button>
-                <Button style={{ background: 'var(--success)', color: 'white' }} onClick={() => handleApproval(r.id, 'approve')}>
-                  <Check size={18} /> Approve
+                <Button className="flex-1 md:flex-none justify-center bg-success text-white hover:bg-success/90" onClick={() => handleApproval(r.id, 'approve')}>
+                  <Check size={18} className="mr-1.5" /> Approve
                 </Button>
               </div>
             </div>
@@ -93,35 +93,41 @@ export const Approvals = () => {
         </div>
       )}
       
-      <h2 style={{ fontSize: '1.25rem', margin: '3rem 0 1.5rem', color: 'var(--text-secondary)' }}>Recently Reviewed</h2>
-      <div className="dashboard-card" style={{ padding: 0, overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr style={{ background: '#f9fafb', borderBottom: '1px solid var(--border-color)', textAlign: 'left' }}>
-              <th style={{ padding: '1rem 1.5rem' }}>Restaurant</th>
-              <th style={{ padding: '1rem 1.5rem' }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {restaurants.filter(r => r.approvalStatus !== 'pending').slice(0, 10).map(r => (
-              <tr key={r.id} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                <td style={{ padding: '1rem 1.5rem' }}>
-                  <div style={{ fontWeight: 500 }}>{r.name}</div>
-                  <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{r.address}</div>
-                </td>
-                <td style={{ padding: '1rem 1.5rem' }}>
-                  <span style={{ 
-                    padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, textTransform: 'capitalize',
-                    background: r.approvalStatus === 'approved' ? '#dcfce7' : '#fee2e2',
-                    color: r.approvalStatus === 'approved' ? '#16a34a' : '#ef4444'
-                  }}>
-                    {r.approvalStatus}
-                  </span>
-                </td>
+      <h2 className="text-xl font-bold text-text-secondary mt-12 mb-6 border-b border-border pb-2">Recently Reviewed</h2>
+      <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden mb-12">
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-50 border-b border-border text-left text-text-secondary text-sm">
+                <th className="p-4 font-semibold whitespace-nowrap">Restaurant</th>
+                <th className="p-4 font-semibold whitespace-nowrap w-32">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {restaurants.filter(r => r.approvalStatus !== 'pending').length === 0 ? (
+                <tr>
+                  <td colSpan={2} className="p-8 text-center text-text-secondary">No reviewed applications found.</td>
+                </tr>
+              ) : (
+                restaurants.filter(r => r.approvalStatus !== 'pending').slice(0, 10).map(r => (
+                  <tr key={r.id} className="hover:bg-gray-50/50 transition-colors">
+                    <td className="p-4">
+                      <div className="font-bold text-text-primary mb-1">{r.name}</div>
+                      <div className="text-sm text-text-secondary">{r.address}</div>
+                    </td>
+                    <td className="p-4 whitespace-nowrap">
+                      <span className={`px-2.5 py-1 rounded-md text-xs font-bold tracking-wide capitalize ${
+                        r.approvalStatus === 'approved' ? 'bg-success-bg text-success' : 'bg-error-bg text-error'
+                      }`}>
+                        {r.approvalStatus}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

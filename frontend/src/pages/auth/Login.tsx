@@ -8,7 +8,6 @@ import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { useAuthStore } from '../../store/authStore';
 import { api } from '../../services/api';
-import './auth.css';
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
@@ -45,20 +44,20 @@ export const Login = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-left">
-        <Link to="/" className="auth-logo">
-          <Utensils color="var(--primary)" size={28} />
+    <div className="min-h-screen flex bg-gray-50">
+      <div className="flex-1 flex flex-col justify-center items-center p-8 bg-white relative">
+        <Link to="/" className="absolute top-8 left-8 text-2xl font-bold text-primary flex items-center gap-2">
+          <Utensils color="currentColor" size={28} />
           QuickBite
         </Link>
         
-        <div className="auth-form-wrapper">
-          <h1 className="auth-title">Welcome back</h1>
-          <p className="auth-subtitle">Login to order your favorite food</p>
+        <div className="w-full max-w-[400px] animate-slide-up mt-12 md:mt-0">
+          <h1 className="text-3xl font-bold mb-2 text-text-primary">Welcome back</h1>
+          <p className="text-text-secondary mb-8">Login to order your favorite food</p>
           
-          <form className="auth-form" onSubmit={handleSubmit(onSubmit)}>
+          <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
             {serverError && (
-              <div style={{ padding: '12px', background: 'var(--error-bg)', color: 'var(--error)', borderRadius: 'var(--radius-md)', fontSize: '0.875rem' }}>
+              <div className="p-3 bg-error-bg text-error rounded-md text-sm border border-error/20">
                 {serverError}
               </div>
             )}
@@ -86,18 +85,19 @@ export const Login = () => {
             </Button>
           </form>
           
-          <div className="auth-footer">
-            Don't have an account? <Link to="/register">Sign up</Link>
+          <div className="mt-6 text-center text-text-secondary text-sm">
+            Don't have an account? <Link to="/register" className="font-semibold text-primary hover:underline">Sign up</Link>
           </div>
         </div>
       </div>
       
-      <div className="auth-right">
-        <div className="auth-shape shape-1" />
-        <div className="auth-shape shape-2" />
-        <div className="auth-glass-card">
-          <h2>Hungry? You're in the right place.</h2>
-          <p>Get food delivery to your doorstep from thousands of amazing local and national restaurants.</p>
+      <div className="hidden md:flex flex-1 flex-col justify-center items-center bg-gradient-to-br from-primary to-[#ff8a00] text-white p-16 relative overflow-hidden">
+        <div className="absolute rounded-full bg-white/10 w-[300px] h-[300px] -top-[100px] -right-[50px]" />
+        <div className="absolute rounded-full bg-white/10 w-[200px] h-[200px] -bottom-[50px] -left-[50px]" />
+        
+        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-10 max-w-[450px] shadow-2xl animate-slide-up z-10">
+          <h2 className="text-4xl font-bold leading-tight mb-4 text-white">Hungry? You're in the right place.</h2>
+          <p className="text-lg opacity-90 leading-relaxed text-white/90">Get food delivery to your doorstep from thousands of amazing local and national restaurants.</p>
         </div>
       </div>
     </div>
