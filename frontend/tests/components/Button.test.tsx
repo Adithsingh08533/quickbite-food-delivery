@@ -11,14 +11,14 @@ describe('Button Component', () => {
   it('applies the correct variant class', () => {
     render(<Button variant="danger">Delete</Button>);
     const button = screen.getByRole('button', { name: /delete/i });
-    expect(button.className).toContain('btn-danger');
+    expect(button.className).toContain('bg-error');
   });
 
   it('disables the button when isLoading is true', () => {
     render(<Button isLoading>Loading</Button>);
     const button = screen.getByRole('button');
     expect(button).toBeDisabled();
-    expect(button.className).toContain('btn-loading');
+    expect(button.className).toContain('pointer-events-none');
   });
 
   it('handles click events', () => {
