@@ -11,7 +11,13 @@ import logger from '../utils/logger';
 
 async function migrate(): Promise<void> {
   const client = await pool.connect();
-  const migrationsDir = path.join(__dirname, 'migrations');
+  let migrationsDir = path.join(__dirname, 'migrations');
+  
+  // If running from dist/database, the migrations folder (containing .sql files) 
+  // won't be copied by tsc, so we fall back to the src directory.
+  if (!fs.existsSync(migrationsDir)) {
+    migrationsDir = path.join(__dirname, '../../src/database/migrations');
+  }
 
   // Create migrations tracking table if it doesn't exist
   await client.query(`
