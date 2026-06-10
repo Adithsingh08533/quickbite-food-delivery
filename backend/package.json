@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon",
     "build": "tsc --project tsconfig.json",
-    "start": "node dist/server.js",
+    "start": "node dist/database/migrate.js && node dist/server.js",
     "seed": "ts-node --project tsconfig.json src/database/seeds/seed.ts",
     "migrate": "ts-node --project tsconfig.json src/database/migrate.ts",
     "test": "jest",
