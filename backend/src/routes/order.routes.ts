@@ -4,7 +4,7 @@ import { authenticateJWT } from '../middleware/auth.middleware';
 import { authorizeRole } from '../middleware/role.middleware';
 import { validate } from '../middleware/validate.middleware';
 import {
-  placeOrderSchema, updateOrderStatusSchema, orderQuerySchema,
+  placeOrderSchema, updateOrderStatusSchema, orderQuerySchema, verifyOrderOtpSchema,
 } from '../validations/order.validation';
 
 const router = Router();
@@ -106,6 +106,22 @@ router.patch(
 router.post(
   '/:id/cancel',
   orderController.cancelOrder
+);
+
+/**
+ * @swagger
+ * /orders/{id}/verify-otp:
+ *   post:
+ *     tags: [Orders]
+ *     summary: Verify delivery OTP (owner only)
+ *     parameters:
+ *       - { in: path, name: id, required: true, schema: { type: string, format: uuid } }
+ */
+router.post(
+  '/:id/verify-otp',
+  authorizeRole('owner'),
+  validate('body', verifyOrderOtpSchema),
+  orderController.verifyOtp
 );
 
 export default router;

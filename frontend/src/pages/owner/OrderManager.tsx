@@ -24,6 +24,7 @@ export const OrderManager = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [otpInputs, setOtpInputs] = useState<Record<string, string>>({});
 
   const fetchOrders = async () => {
     try {
@@ -106,6 +107,35 @@ export const OrderManager = () => {
     }
   };
 
+  const verifyOtp = async (orderId: string) => {
+    if (updatingOrderId || isUpdatingRef.current) return;
+    const otp = otpInputs[orderId];
+    if (!otp || otp.length !== 4) {
+      alert('Please enter a valid 4-digit OTP');
+      return;
+    }
+    
+    isUpdatingRef.current = true;
+    setUpdatingOrderId(orderId);
+    try {
+      await api.post(`/orders/${orderId}/verify-otp`, { otp });
+      // Optimistic update
+      setOrders(prevOrders => 
+        prevOrders.map(o => o.id === orderId ? { ...o, status: 'delivered' } : o)
+      );
+      setOtpInputs(prev => {
+        const newInputs = { ...prev };
+        delete newInputs[orderId];
+        return newInputs;
+      });
+    } catch (err: any) {
+      alert(err.response?.data?.error || 'Failed to verify OTP');
+    } finally {
+      setUpdatingOrderId(null);
+      isUpdatingRef.current = false;
+    }
+  };
+
   const getNextStatusAction = (currentStatus: string, id: string) => {
     const isUpdating = updatingOrderId === id;
     
@@ -124,7 +154,19 @@ export const OrderManager = () => {
       case 'ready_for_pickup':
         return <Button size="sm" fullWidth onClick={() => updateStatus(id, 'out_for_delivery')} disabled={isUpdating} isLoading={isUpdating}>Out for Delivery</Button>;
       case 'out_for_delivery':
-        return <Button size="sm" fullWidth onClick={() => updateStatus(id, 'delivered')} disabled={isUpdating} isLoading={isUpdating}>Mark Delivered</Button>;
+        return (
+          <div className="flex gap-2 items-center">
+            <input 
+              type="text" 
+              placeholder="4-digit OTP" 
+              maxLength={4}
+              value={otpInputs[id] || ''}
+              onChange={e => setOtpInputs(prev => ({ ...prev, [id]: e.target.value.replace(/[^0-9]/g, '') }))}
+              className="flex-1 px-3 py-2 rounded-md border border-gray-300 outline-none focus:border-primary text-sm font-semibold tracking-widest text-center"
+            />
+            <Button size="sm" onClick={() => verifyOtp(id)} disabled={isUpdating} isLoading={isUpdating}>Verify</Button>
+          </div>
+        );
       default:
         return null; // delivered or cancelled
     }

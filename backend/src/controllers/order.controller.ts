@@ -47,4 +47,11 @@ export const orderController = {
     );
     sendSuccess(res, order, 'Order cancelled');
   }),
+
+  verifyOtp: asyncHandler(async (req: Request, res: Response) => {
+    const order = await orderService.verifyDeliveryOtp(
+      req.params.id!, req.user!.userId, req.body.otp
+    );
+    sendSuccess(res, order, 'Order delivered successfully');
+  }),
 };

@@ -211,8 +211,18 @@ export const orderService = {
       throw new AppError('Customers cannot update order status', 403);
     }
 
+    let otp: string | undefined;
+    let otpGeneratedAt: Date | undefined;
+
+    if (data.status === 'out_for_delivery') {
+      otp = Math.floor(1000 + Math.random() * 9000).toString();
+      otpGeneratedAt = new Date();
+    }
+
     await orderRepository.updateStatus(id, data.status, {
       cancellationReason: data.cancellationReason,
+      otp,
+      otpGeneratedAt,
     });
 
     // Send notification to customer
@@ -247,6 +257,54 @@ export const orderService = {
 
     try {
       getIO().to(`user_${updated.userId}`).emit('order_status_updated', updated);
+    } catch (err) {
+      console.error('Socket emission failed:', err);
+    }
+
+    return updated;
+  },
+
+  async verifyDeliveryOtp(id: string, ownerId: string, otp: string): Promise<OrderWithItems> {
+    const order = await orderRepository.findById(id);
+    if (!order) throw new AppError('Order not found', 404);
+
+    const restaurant = await restaurantRepository.findById(order.restaurantId);
+    if (!restaurant || restaurant.ownerId !== ownerId) {
+      throw new AppError('Access denied', 403);
+    }
+
+    if (order.status !== 'out_for_delivery') {
+      throw new AppError('Order is not out for delivery', 400);
+    }
+
+    if (!order.otp || order.otp !== otp) {
+      throw new AppError('Invalid OTP', 400);
+    }
+
+    let paymentStatus = order.paymentStatus;
+    if (order.paymentMethod === 'cod') {
+      paymentStatus = 'paid';
+    }
+
+    await orderRepository.updateStatus(id, 'delivered', {
+      otpVerified: true,
+      paymentStatus,
+    });
+
+    await notificationRepository.create({
+      userId: order.userId,
+      type: 'order_delivered',
+      title: 'Order Delivered',
+      body: 'Enjoy your meal! Rate your experience.',
+      data: { orderId: id, orderNumber: order.orderNumber },
+    });
+
+    const updated = await orderRepository.findById(id);
+    if (!updated) throw new AppError('Order not found after update', 500);
+
+    try {
+      getIO().to(`user_${updated.userId}`).emit('order_status_updated', updated);
+      getIO().to(`restaurant_${updated.restaurantId}`).emit('order_status_updated', updated);
     } catch (err) {
       console.error('Socket emission failed:', err);
     }

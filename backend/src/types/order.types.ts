@@ -35,6 +35,9 @@ export interface Order {
   deliveredAt: Date | null;
   cancelledAt: Date | null;
   cancellationReason: string | null;
+  otp: string | null;
+  otpVerified: boolean;
+  otpGeneratedAt: Date | null;
   updatedAt: Date;
 }
 

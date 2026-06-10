@@ -26,6 +26,9 @@ const mapOrder = (row: Record<string, any>): Order => ({
   deliveredAt:          row.delivered_at,
   cancelledAt:          row.cancelled_at,
   cancellationReason:   row.cancellation_reason,
+  otp:                  row.otp,
+  otpVerified:          row.otp_verified,
+  otpGeneratedAt:       row.otp_generated_at,
   updatedAt:            row.updated_at,
 });
 
@@ -247,7 +250,7 @@ export const orderRepository = {
   async updateStatus(
     id: string,
     status: string,
-    extra?: { cancellationReason?: string; paymentStatus?: string }
+    extra?: { cancellationReason?: string; paymentStatus?: string; otp?: string; otpVerified?: boolean; otpGeneratedAt?: Date }
   ): Promise<Order | null> {
     const statusTimestampMap: Record<string, string> = {
       accepted:         'accepted_at',
@@ -270,6 +273,18 @@ export const orderRepository = {
     if (extra?.paymentStatus) {
       sql += `, payment_status = $${idx++}`;
       params.push(extra.paymentStatus);
+    }
+    if (extra?.otp !== undefined) {
+      sql += `, otp = $${idx++}`;
+      params.push(extra.otp);
+    }
+    if (extra?.otpVerified !== undefined) {
+      sql += `, otp_verified = $${idx++}`;
+      params.push(extra.otpVerified);
+    }
+    if (extra?.otpGeneratedAt !== undefined) {
+      sql += `, otp_generated_at = $${idx++}`;
+      params.push(extra.otpGeneratedAt);
     }
 
     params.push(id);

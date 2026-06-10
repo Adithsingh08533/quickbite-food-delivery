@@ -165,7 +165,7 @@ export const Checkout = () => {
       if (paymentMethod === 'cod') {
         // 5. Success! Clear cart and redirect for COD
         await clearCart();
-        navigate('/orders', { state: { success: true } });
+        navigate('/orders', { state: { success: true, paymentMethod: 'cod' } });
         return;
       }
 
@@ -193,7 +193,7 @@ export const Checkout = () => {
 
             // 5. Success! Clear cart and redirect
             await clearCart();
-            navigate('/orders', { state: { success: true } });
+            navigate('/orders', { state: { success: true, paymentMethod: 'online' } });
           } catch (err) {
             alert('Payment verification failed. Please contact support if amount was deducted.');
           }

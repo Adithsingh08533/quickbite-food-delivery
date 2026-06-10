@@ -28,7 +28,12 @@ export const verifyPaymentSchema = z.object({
   razorpaySignature:  z.string().min(1, 'Razorpay signature is required'),
 });
 
+export const verifyOrderOtpSchema = z.object({
+  otp: z.string().length(4, 'OTP must be exactly 4 digits'),
+});
+
 export type PlaceOrderDto         = z.infer<typeof placeOrderSchema>;
 export type UpdateOrderStatusDto  = z.infer<typeof updateOrderStatusSchema>;
 export type OrderQueryDto         = z.infer<typeof orderQuerySchema>;
 export type VerifyPaymentDto      = z.infer<typeof verifyPaymentSchema>;
+export type VerifyOrderOtpDto     = z.infer<typeof verifyOrderOtpSchema>;

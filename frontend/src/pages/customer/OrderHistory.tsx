@@ -21,6 +21,7 @@ interface Order {
   totalAmount: number;
   placedAt: string;
   items: OrderItem[];
+  otp?: string;
 }
 
 export const OrderHistory = () => {
@@ -183,7 +184,9 @@ export const OrderHistory = () => {
       {showSuccess && (
         <div className="bg-success-bg text-success p-4 rounded-md mb-8 flex items-center gap-2 font-semibold">
           <CheckCircle size={20} />
-          Payment successful! Your order has been placed.
+          {location.state?.paymentMethod === 'cod' 
+            ? 'Order placed successfully. Payment will be collected upon delivery.'
+            : 'Payment successful! Your order has been placed.'}
         </div>
       )}
 
@@ -212,6 +215,14 @@ export const OrderHistory = () => {
               </div>
 
               {getTimelineStatus(order.status)}
+
+              {order.status === 'out_for_delivery' && order.otp && (
+                <div className="bg-blue-50 border-y border-blue-100 p-4 text-center">
+                  <span className="text-blue-800 text-sm font-semibold">Delivery OTP:</span>
+                  <span className="ml-2 text-2xl font-bold tracking-widest text-blue-900">{order.otp}</span>
+                  <p className="text-xs text-blue-600 mt-1">Please share this with the delivery partner.</p>
+                </div>
+              )}
 
               <div className="p-4 sm:p-6">
                 <div className="space-y-3">
