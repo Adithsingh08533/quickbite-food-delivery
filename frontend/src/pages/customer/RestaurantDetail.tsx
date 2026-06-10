@@ -285,7 +285,7 @@ export const RestaurantDetail = () => {
         {reviews.length === 0 ? (
           <p className="text-text-secondary">No reviews yet.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {reviews.map(review => (
               <div key={review.id} className="bg-white p-6 rounded-lg shadow-sm border border-border">
                 <div className="flex justify-between mb-4">

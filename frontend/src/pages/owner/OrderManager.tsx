@@ -141,7 +141,7 @@ export const OrderManager = () => {
 
       <h2 className="text-lg font-semibold text-text-secondary mb-4 border-b border-border pb-2">Active Orders ({activeOrders.length})</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {activeOrders.length === 0 ? (
           <div className="col-span-full bg-white rounded-xl border border-border p-12 text-center text-text-secondary shadow-sm">
             <div className="mx-auto w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-100">
